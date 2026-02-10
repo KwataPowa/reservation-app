@@ -100,7 +100,18 @@ export default function MaterialDetailModal({ material, isOpen, onClose, isAdmin
                         </span>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-gray-900 leading-tight mb-2">{material.name}</h2>
+                    <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-2xl font-bold text-gray-900 leading-tight">{material.name}</h2>
+                        {isAdmin && (
+                            <Link
+                                href={`/admin/materials/${material.id}/edit`}
+                                className="p-1.5 text-gray-400 hover:text-[#2566AF] hover:bg-blue-50 rounded-full transition-colors flex items-center gap-1"
+                                title="Modifier ce matériel"
+                            >
+                                <Edit size={18} />
+                            </Link>
+                        )}
+                    </div>
 
                     <div className="flex flex-wrap gap-2 mb-4">
                         <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-white border border-gray-200 rounded text-xs font-medium text-gray-600">
@@ -159,21 +170,10 @@ export default function MaterialDetailModal({ material, isOpen, onClose, isAdmin
                 {/* Right Panel: Reservation Form */}
                 <div className="w-full md:w-1/2 flex flex-col p-6 bg-white">
                     <div className="flex justify-between items-center mb-6">
-                        <div className="flex items-center gap-3">
-                            <h3 className="text-lg font-bold text-gray-800 uppercase tracking-tight flex items-center gap-2">
-                                <Calendar size={20} className="text-[#2566AF]" />
-                                Réserver
-                            </h3>
-                            {isAdmin && (
-                                <Link
-                                    href={`/admin/materials/${material.id}/edit`}
-                                    className="p-1.5 text-gray-400 hover:text-[#2566AF] hover:bg-blue-50 rounded-full transition-colors flex items-center gap-1"
-                                    title="Modifier ce matériel"
-                                >
-                                    <Edit size={16} />
-                                </Link>
-                            )}
-                        </div>
+                        <h3 className="text-lg font-bold text-gray-800 uppercase tracking-tight flex items-center gap-2">
+                            <Calendar size={20} className="text-[#2566AF]" />
+                            Réserver
+                        </h3>
                         <button onClick={handleClose} className="text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 p-2 rounded-full">
                             <X size={20} />
                         </button>
