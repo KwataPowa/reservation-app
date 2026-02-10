@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import { Material } from '@prisma/client';
 import { useRouter } from 'next/navigation';
-import { X, MapPin, Tag, Hash, Calendar, FileText, Send, AlertCircle, Box, DollarSign, Image as ImageIcon } from 'lucide-react';
-import Image from 'next/image';
+import { X, MapPin, Tag, Hash, Calendar, FileText, Send, AlertCircle, Box, DollarSign, Image as ImageIcon, Edit } from 'lucide-react';
+import Link from 'next/link';
 
 interface MaterialDetailModalProps {
     material: Material | null;
     isOpen: boolean;
     onClose: () => void;
+    isAdmin?: boolean;
 }
+
 
 const statusConfig: Record<string, { label: string; color: string }> = {
     AVAILABLE: { label: 'Disponible', color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
@@ -18,7 +20,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
     UNAVAILABLE: { label: 'Indisponible', color: 'text-red-600 bg-red-50 border-red-200' },
 };
 
-export default function MaterialDetailModal({ material, isOpen, onClose }: MaterialDetailModalProps) {
+export default function MaterialDetailModal({ material, isOpen, onClose, isAdmin }: MaterialDetailModalProps) {
     const router = useRouter();
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -157,15 +159,25 @@ export default function MaterialDetailModal({ material, isOpen, onClose }: Mater
                 {/* Right Panel: Reservation Form */}
                 <div className="w-full md:w-1/2 flex flex-col p-6 bg-white">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-bold text-gray-800 uppercase tracking-tight flex items-center gap-2">
-                            <Calendar size={20} className="text-[#2566AF]" />
-                            Réserver
-                        </h3>
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-bold text-gray-800 uppercase tracking-tight flex items-center gap-2">
+                                <Calendar size={20} className="text-[#2566AF]" />
+                                Réserver
+                            </h3>
+                            {isAdmin && (
+                                <Link
+                                    href={`/admin/materials/${material.id}/edit`}
+                                    className="p-1.5 text-gray-400 hover:text-[#2566AF] hover:bg-blue-50 rounded-full transition-colors flex items-center gap-1"
+                                    title="Modifier ce matériel"
+                                >
+                                    <Edit size={16} />
+                                </Link>
+                            )}
+                        </div>
                         <button onClick={handleClose} className="text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 hover:bg-gray-100 p-2 rounded-full">
                             <X size={20} />
                         </button>
                     </div>
-
                     {canReserve ? (
                         <form onSubmit={handleSubmit} className="flex-grow flex flex-col gap-5">
                             <div className="grid grid-cols-2 gap-4">

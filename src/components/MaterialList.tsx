@@ -9,9 +9,10 @@ import { Filter } from 'lucide-react';
 interface MaterialListProps {
     materials: Material[];
     categories: Record<string, Material[]>;
+    isAdmin?: boolean;
 }
 
-export default function MaterialList({ materials, categories }: MaterialListProps) {
+export default function MaterialList({ materials, categories, isAdmin }: MaterialListProps) {
     const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filter, setFilter] = useState('ALL');
@@ -33,8 +34,8 @@ export default function MaterialList({ materials, categories }: MaterialListProp
                 <button
                     onClick={() => setFilter('ALL')}
                     className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-all whitespace-nowrap ${filter === 'ALL'
-                            ? 'bg-[#2566AF] text-white border-[#2566AF]'
-                            : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                        ? 'bg-[#2566AF] text-white border-[#2566AF]'
+                        : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
                         }`}
                 >
                     Tous
@@ -44,8 +45,8 @@ export default function MaterialList({ materials, categories }: MaterialListProp
                         key={cat}
                         onClick={() => setFilter(cat)}
                         className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-all whitespace-nowrap ${filter === cat
-                                ? 'bg-[#2566AF] text-white border-[#2566AF]'
-                                : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                            ? 'bg-[#2566AF] text-white border-[#2566AF]'
+                            : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
                             }`}
                     >
                         {cat}
@@ -86,6 +87,7 @@ export default function MaterialList({ materials, categories }: MaterialListProp
                 material={selectedMaterial}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                isAdmin={isAdmin}
             />
         </div>
     );

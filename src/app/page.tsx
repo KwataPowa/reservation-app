@@ -38,7 +38,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <MaterialList materials={materials} categories={grouped} />
+      <MaterialList materials={materials} categories={grouped} isAdmin={session?.user?.role === 'ADMIN'} />
     </div>
   );
 }
