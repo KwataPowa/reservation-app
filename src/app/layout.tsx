@@ -3,8 +3,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "ICUBE Resa - Réservation de matériel",
-  description: "Plateforme de réservation de matériel pour le laboratoire ICUBE",
+  title: "ICUBE Resa - Plateforme Scientifique",
+  description: "Système de réservation de matériel haute performance",
 };
 
 export default function RootLayout({
@@ -14,9 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className="min-h-screen bg-[#f8f9fa]">
+      <body className="min-h-screen bg-[#F1F5F9] flex">
         <Navbar />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        {/* Main content shifted right to accommodate sidebar */}
+        <main className="flex-1 ml-16 transition-all duration-300 p-8 w-full max-w-[1920px]">
           {children}
         </main>
       </body>

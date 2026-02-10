@@ -22,59 +22,55 @@ export default async function AdminPage() {
     const approvedCount = reservations.filter(r => r.status === 'APPROVED').length;
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-gray-900">Administration</h1>
+                <div>
+                    <h1 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Panneau Administration</h1>
+                    <p className="mt-1 text-xs text-gray-500 font-mono">GESTION DES RESSOURCES ET DEMANDES</p>
+                </div>
                 <Link
                     href="/admin/materials/new"
-                    className="inline-flex items-center rounded-md bg-[#2566AF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e5294] transition-colors"
+                    className="inline-flex items-center gap-2 bg-[#2566AF] text-white px-4 py-2 text-sm font-bold uppercase tracking-wider hover:bg-[#1A4B82] transition-colors shadow-sm"
                 >
-                    + Ajouter un matériel
+                    <span className="text-lg leading-none">+</span> Nouveau Matériel
                 </Link>
             </div>
 
-            {/* Stats cards */}
+            {/* KPI Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div className="bg-white rounded-lg border border-gray-200 p-5">
-                    <p className="text-sm font-medium text-gray-500">Matériels enregistrés</p>
-                    <p className="mt-1 text-3xl font-bold text-gray-900">{materialCount}</p>
-                </div>
-                <div className="bg-white rounded-lg border border-gray-200 p-5">
-                    <p className="text-sm font-medium text-gray-500">En attente</p>
-                    <p className="mt-1 text-3xl font-bold text-yellow-600">{pendingCount}</p>
-                </div>
-                <div className="bg-white rounded-lg border border-gray-200 p-5">
-                    <p className="text-sm font-medium text-gray-500">Approuvées</p>
-                    <p className="mt-1 text-3xl font-bold text-green-600">{approvedCount}</p>
-                </div>
+                <StatCard label="Total Équipements" value={materialCount} icon="📦" />
+                <StatCard label="Demandes en Attente" value={pendingCount} color="text-yellow-600" bg="bg-yellow-50" icon="⚠️" />
+                <StatCard label="Réservations Actives" value={approvedCount} color="text-green-600" bg="bg-green-50" icon="✅" />
             </div>
 
-            {/* Reservations Table */}
-            <div className="bg-white rounded-lg border border-gray-200">
-                <div className="px-5 py-4 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                        Toutes les réservations
+            {/* Reservations Panel */}
+            <div className="bg-white lab-panel">
+                <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                    <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                        Flux des Réservations
                     </h2>
+                    <span className="text-xs font-mono text-gray-400">{reservations.length} ENREGISTREMENTS</span>
                 </div>
+
                 {reservations.length === 0 ? (
-                    <div className="px-5 py-12 text-center text-gray-400">
-                        Aucune réservation pour le moment.
+                    <div className="p-12 text-center">
+                        <p className="text-gray-400 font-mono text-sm">Aucune donnée disponible.</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="py-3 pl-5 pr-3 text-left text-xs font-semibold text-gray-500 uppercase">Matériel</th>
-                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Utilisateur</th>
-                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Dates</th>
-                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Motif</th>
-                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Statut</th>
-                                    <th className="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Équipement</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Demandeur</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Période</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Motif</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Statut</th>
+                                    <th className="px-6 py-3 text-right text-[10px] font-bold text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 bg-white">
+                            <tbody className="bg-white divide-y divide-gray-100">
                                 {reservations.map((reservation) => (
                                     <AdminReservationActions
                                         key={reservation.id}
@@ -93,6 +89,18 @@ export default async function AdminPage() {
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+function StatCard({ label, value, color = "text-gray-900", bg = "bg-white", icon }: { label: string, value: number, color?: string, bg?: string, icon: string }) {
+    return (
+        <div className={`${bg} lab-panel p-5 flex items-center justify-between`}>
+            <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{label}</p>
+                <p className={`mt-1 text-3xl font-mono font-bold ${color}`}>{value}</p>
+            </div>
+            <span className="text-2xl opacity-20 grayscale">{icon}</span>
         </div>
     );
 }
