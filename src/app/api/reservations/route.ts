@@ -51,6 +51,9 @@ export async function POST(request: Request) {
             )
         }
 
+
+        const status = session.user.role === 'ADMIN' ? 'APPROVED' : 'PENDING';
+
         const reservation = await prisma.reservation.create({
             data: {
                 userId: session.user.id!,
@@ -58,6 +61,8 @@ export async function POST(request: Request) {
                 startDate: new Date(body.startDate),
                 endDate: new Date(body.endDate),
                 purpose: body.purpose || null,
+                location: body.location || null,
+                status: status,
             },
         })
         return NextResponse.json(reservation, { status: 201 })

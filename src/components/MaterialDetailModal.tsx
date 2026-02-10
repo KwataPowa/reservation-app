@@ -25,6 +25,7 @@ export default function MaterialDetailModal({ material, isOpen, onClose, isAdmin
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [purpose, setPurpose] = useState('');
+    const [location, setLocation] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -50,6 +51,7 @@ export default function MaterialDetailModal({ material, isOpen, onClose, isAdmin
                     startDate,
                     endDate,
                     purpose,
+                    location,
                 }),
             });
 
@@ -203,6 +205,17 @@ export default function MaterialDetailModal({ material, isOpen, onClose, isAdmin
                                         className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF] outline-none transition-all"
                                     />
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Lieu / Salle</label>
+                                <input
+                                    type="text"
+                                    value={location}
+                                    onChange={e => setLocation(e.target.value)}
+                                    placeholder="Ex: Salle 204, Chantier A..."
+                                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF] outline-none transition-all"
+                                />
                             </div>
 
                             <div>

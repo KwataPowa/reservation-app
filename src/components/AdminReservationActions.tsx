@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, X, Clock, CheckCircle, XCircle, Ban, AlertCircle } from 'lucide-react';
+import { Check, X, Clock, CheckCircle, XCircle, Ban, AlertCircle, MapPin } from 'lucide-react';
 
 interface Reservation {
     id: string;
@@ -11,6 +11,7 @@ interface Reservation {
     status: string;
     purpose: string | null;
     createdAt: string;
+    location: string | null;
     user: { name: string | null; email: string };
     material: { name: string; category: string | null };
 }
@@ -63,7 +64,15 @@ export default function AdminReservationActions({ reservation }: { reservation: 
                 )}
             </td>
             <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-600">
-                {reservation.user.name || reservation.user.email}
+                <div className="flex flex-col">
+                    <span className="font-medium text-gray-900">{reservation.user.name || 'Sans nom'}</span>
+                    <a href={`mailto:${reservation.user.email}`} className="text-xs text-blue-600 hover:underline">{reservation.user.email}</a>
+                    {reservation.location && (
+                        <span className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1">
+                            <MapPin size={10} /> {reservation.location}
+                        </span>
+                    )}
+                </div>
             </td>
             <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500 lab-mono">
                 {new Date(reservation.startDate).toLocaleDateString('fr-FR')} → {new Date(reservation.endDate).toLocaleDateString('fr-FR')}

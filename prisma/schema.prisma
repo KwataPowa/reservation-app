@@ -42,6 +42,7 @@ model Reservation {
   startDate   DateTime
   endDate     DateTime
   purpose     String?
+  location    String?
   status      ReservationStatus @default(PENDING)
   userId      String
   user        User      @relation(fields: [userId], references: [id])
