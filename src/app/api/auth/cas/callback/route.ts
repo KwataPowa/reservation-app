@@ -2,26 +2,26 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { encode } from "next-auth/jwt";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
+    const { searchParams, origin } = new URL(request.url);
     const ticket = searchParams.get('ticket');
 
     if (!ticket) {
         return NextResponse.redirect(new URL('/auth/signin?error=ticket_missing', request.url));
     }
 
-    const serviceUrl = process.env.CAS_SERVICE_URL;
-    const validateUrl = `https://cas.unistra.fr/cas/serviceValidate?service=${serviceUrl}&ticket=${ticket}`;
+    // Construct service URL dynamically from request origin to support both localhost and Vercel
+    const serviceUrl = `${origin}/api/auth/cas/callback`;
+    const validateUrl = `https://cas.unistra.fr/cas/serviceValidate?service=${encodeURIComponent(serviceUrl)}&ticket=${ticket}`;
 
     try {
         const response = await fetch(validateUrl);
         const xmlData = await response.text();
 
-
-
         // Vérifier si l'authentification a réussi
         if (xmlData.includes('<cas:authenticationSuccess>')) {
-
 
             // Extraire le nom d'utilisateur
             const userMatch = xmlData.match(/<cas:user>([^<]+)<\/cas:user>/);
@@ -39,18 +39,17 @@ export async function GET(request: Request) {
             console.log('Display Name CAS:', displayName);
 
             if (!casEmail) {
-
                 return NextResponse.redirect(new URL('/auth/signin?error=no_email', request.url));
             }
 
-            // Vérifie si l'utilisateur existze déjà
+            // Vérifie si l'utilisateur existe déjà
             let user = await prisma.user.findUnique({
                 where: { email: casEmail }
             });
 
             console.log('Utilisateur existant trouvé:', user ? 'OUI' : 'NON');
 
-            // Si l utilisateur n'existe pas, on le crée
+            // Si l'utilisateur n'existe pas, on le crée
             if (!user) {
                 user = await prisma.user.create({
                     data: {
@@ -59,20 +58,15 @@ export async function GET(request: Request) {
                         emailVerified: new Date(),
                     }
                 });
-
-            } else {
-
             }
-
-
 
             // Créer un token JWT NextAuth
             const secret = process.env.NEXTAUTH_SECRET;
             if (!secret) {
-
                 return NextResponse.redirect(new URL('/auth/signin?error=config_error', request.url));
             }
 
+            // Must match the cookie name configured in auth.ts
             const cookieName = process.env.NODE_ENV === 'production'
                 ? '__Secure-next-auth.session-token'
                 : 'next-auth.session-token';
@@ -83,28 +77,24 @@ export async function GET(request: Request) {
                     email: user.email,
                     name: user.name,
                     role: user.role,
+                    sub: user.id, // Subject is important
                 },
                 secret: secret,
                 salt: cookieName,
-                maxAge: 30 * 24 * 60 * 60, // 30 jours
             });
 
             // Créer la réponse avec redirection
-            const response = NextResponse.redirect(new URL('/', request.url));
-
+            const redirectResponse = NextResponse.redirect(new URL('/', request.url));
 
             // Définir le cookie de session NextAuth
-            response.cookies.set(cookieName, token, {
+            redirectResponse.cookies.set(cookieName, token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
-                maxAge: 30 * 24 * 60 * 60,
                 path: '/',
             });
 
-
-
-            return response;
+            return redirectResponse;
 
         } else if (xmlData.includes('<cas:authenticationFailure>')) {
             // Extraire le message d'erreur
