@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { Material } from '@prisma/client';
 import MaterialCard from './MaterialCard';
-import ReservationModal from './ReservationModal';
+import MaterialDetailModal from './MaterialDetailModal';
+import { Filter } from 'lucide-react';
 
 interface MaterialListProps {
     materials: Material[];
@@ -15,7 +16,7 @@ export default function MaterialList({ materials, categories }: MaterialListProp
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filter, setFilter] = useState('ALL');
 
-    const handleReserve = (material: Material) => {
+    const handleCardClick = (material: Material) => {
         setSelectedMaterial(material);
         setIsModalOpen(true);
     };
@@ -27,21 +28,22 @@ export default function MaterialList({ materials, categories }: MaterialListProp
     return (
         <div className="flex flex-col gap-6">
             {/* Filter Bar */}
-            <div className="flex gap-2 overflow-x-auto pb-2 lab-scrollbar">
+            <div className="flex items-center gap-3 overflow-x-auto pb-1">
+                <Filter size={14} className="text-gray-400 shrink-0" />
                 <button
                     onClick={() => setFilter('ALL')}
-                    className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wide border transition-all ${filter === 'ALL'
+                    className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-all whitespace-nowrap ${filter === 'ALL'
                             ? 'bg-[#2566AF] text-white border-[#2566AF]'
                             : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
                         }`}
                 >
-                    Tout voir
+                    Tous
                 </button>
                 {Object.keys(categories).sort().map(cat => (
                     <button
                         key={cat}
                         onClick={() => setFilter(cat)}
-                        className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wide border transition-all whitespace-nowrap ${filter === cat
+                        className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-all whitespace-nowrap ${filter === cat
                                 ? 'bg-[#2566AF] text-white border-[#2566AF]'
                                 : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
                             }`}
@@ -51,21 +53,21 @@ export default function MaterialList({ materials, categories }: MaterialListProp
                 ))}
             </div>
 
-            {/* Grid */}
+            {/* Categories */}
             <div className="space-y-8">
                 {activeCategories.map(([category, items]) => (
-                    <div key={category} className="animate-in fade-in duration-500">
+                    <div key={category}>
                         <div className="flex items-center gap-4 mb-4">
                             <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wider">{category}</h2>
-                            <div className="h-px bg-gray-200 flex-grow"></div>
-                            <span className="text-xs text-gray-400 font-mono">{items.length} ITEM{items.length > 1 ? 'S' : ''}</span>
+                            <div className="h-px bg-gray-200 flex-grow" />
+                            <span className="text-xs text-gray-400 lab-mono">{items.length}</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {items.map((material) => (
+                            {items.map(material => (
                                 <MaterialCard
                                     key={material.id}
                                     material={material}
-                                    onReserve={handleReserve}
+                                    onClick={handleCardClick}
                                 />
                             ))}
                         </div>
@@ -73,14 +75,14 @@ export default function MaterialList({ materials, categories }: MaterialListProp
                 ))}
 
                 {activeCategories.length === 0 && (
-                    <div className="text-center py-20 bg-gray-50 border border-dashed border-gray-200 rounded">
-                        <p className="text-gray-400 text-sm">Aucun matériel trouvé dans cette catégorie.</p>
+                    <div className="text-center py-20 bg-gray-50 border border-dashed border-gray-200">
+                        <p className="text-gray-400 text-sm">Aucun équipement dans cette catégorie.</p>
                     </div>
                 )}
             </div>
 
-            {/* Modal */}
-            <ReservationModal
+            {/* Detail + Reservation Modal */}
+            <MaterialDetailModal
                 material={selectedMaterial}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

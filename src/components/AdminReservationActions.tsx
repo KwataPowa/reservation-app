@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Check, X, Clock, CheckCircle, XCircle, Ban } from 'lucide-react';
 
 interface Reservation {
     id: string;
@@ -12,6 +13,13 @@ interface Reservation {
     user: { name: string | null; email: string };
     material: { name: string; category: string | null };
 }
+
+const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+    PENDING: { label: 'En attente', color: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={12} /> },
+    APPROVED: { label: 'Approuvée', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle size={12} /> },
+    REJECTED: { label: 'Refusée', color: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={12} /> },
+    CANCELLED: { label: 'Annulée', color: 'bg-gray-50 text-gray-600 border-gray-200', icon: <Ban size={12} /> },
+};
 
 export default function AdminReservationActions({ reservation }: { reservation: Reservation }) {
     const [status, setStatus] = useState(reservation.status);
@@ -33,50 +41,49 @@ export default function AdminReservationActions({ reservation }: { reservation: 
         }
     };
 
-    const statusConfig: Record<string, { label: string; color: string }> = {
-        PENDING: { label: 'En attente', color: 'bg-yellow-100 text-yellow-700' },
-        APPROVED: { label: 'Approuvée', color: 'bg-green-100 text-green-700' },
-        REJECTED: { label: 'Refusée', color: 'bg-red-100 text-red-700' },
-        CANCELLED: { label: 'Annulée', color: 'bg-gray-100 text-gray-600' },
-    };
-
     const config = statusConfig[status] || statusConfig.PENDING;
 
     return (
-        <tr className="hover:bg-gray-50 transition-colors">
-            <td className="whitespace-nowrap py-3 pl-5 pr-3 text-sm font-medium text-gray-900">
+        <tr className="hover:bg-gray-50/50 transition-colors">
+            <td className="whitespace-nowrap py-3 pl-6 pr-3 text-sm font-medium text-gray-900">
                 {reservation.material.name}
+                {reservation.material.category && (
+                    <span className="block text-[10px] text-gray-400 font-normal mt-0.5">{reservation.material.category}</span>
+                )}
             </td>
-            <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
+            <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-600">
                 {reservation.user.name || reservation.user.email}
             </td>
-            <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
+            <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500 lab-mono">
                 {new Date(reservation.startDate).toLocaleDateString('fr-FR')} → {new Date(reservation.endDate).toLocaleDateString('fr-FR')}
             </td>
-            <td className="px-3 py-3 text-sm text-gray-500 max-w-[200px] truncate">
-                {reservation.purpose || '-'}
+            <td className="px-3 py-3 text-sm text-gray-500 max-w-[200px] truncate" title={reservation.purpose || ''}>
+                {reservation.purpose || '—'}
             </td>
             <td className="whitespace-nowrap px-3 py-3 text-sm">
-                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}>
+                <span className={`inline-flex items-center gap-1.5 border px-2 py-0.5 text-xs font-medium ${config.color}`}>
+                    {config.icon}
                     {config.label}
                 </span>
             </td>
-            <td className="whitespace-nowrap px-3 py-3 text-sm text-right">
+            <td className="whitespace-nowrap px-3 py-3 text-sm text-right pr-6">
                 {status === 'PENDING' && (
                     <div className="flex gap-2 justify-end">
                         <button
                             onClick={() => handleAction('APPROVED')}
                             disabled={loading}
-                            className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-500 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center gap-1 bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors"
                         >
-                            ✓ Approuver
+                            <Check size={13} />
+                            Valider
                         </button>
                         <button
                             onClick={() => handleAction('REJECTED')}
                             disabled={loading}
-                            className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center gap-1 bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
                         >
-                            ✗ Refuser
+                            <X size={13} />
+                            Refuser
                         </button>
                     </div>
                 )}
