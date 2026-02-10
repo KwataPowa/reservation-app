@@ -3,56 +3,43 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
-function SignInGeneric() {
+function SignInContent() {
     const searchParams = useSearchParams();
     const error = searchParams.get('error');
 
     const handleLogin = () => {
-        // Redirect to CAS login
-        // The service URL must match what is configured in .env and expected by the callback
-        // We can fetch it or hardcode relative path if we know the domain
-        // Ideally we redirect to the API route that handles the initiation, or construct URL here.
-        // For now, let's construct it manually or fetch from an endpoint.
-        // Since we are client side, we don't have process.env.CAS_SERVICE_URL directly unless NEXT_PUBLIC.
-        // Let's assume the user knows they need to click it.
-
-        // Better: Redirect to an API route that redirects to CAS, to keep secrets server-side.
-        // But for simplicity, we can do it here if we expose the service URL.
-
-        // Actually, the callback URL is http://localhost:3000/api/auth/cas/callback (or production equivalent)
-        // The service parameter sent to CAS must matches this.
-
         const serviceUrl = window.location.origin + '/api/auth/cas/callback';
         window.location.href = `https://cas.unistra.fr/cas/login?service=${encodeURIComponent(serviceUrl)}`;
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-                    Sign inside
-                </h2>
+        <div className="flex min-h-[70vh] flex-col items-center justify-center">
+            <div className="w-full max-w-sm">
+                <div className="text-center mb-8">
+                    <h1 className="text-2xl font-bold text-[#2566AF]">ICUBE Resa</h1>
+                    <p className="mt-2 text-sm text-gray-500">
+                        Connectez-vous pour réserver du matériel
+                    </p>
+                </div>
+
                 {error && (
-                    <div className="mt-4 rounded-md bg-red-50 p-4">
-                        <div className="flex">
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-red-800">
-                                    Authentication Error: {error}
-                                </h3>
-                            </div>
-                        </div>
+                    <div className="mb-4 rounded-md bg-red-50 border border-red-200 p-4">
+                        <p className="text-sm text-red-700">
+                            Erreur d&apos;authentification : {error}
+                        </p>
                     </div>
                 )}
-            </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
+                <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
                     <button
                         onClick={handleLogin}
-                        className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="flex w-full justify-center rounded-md bg-[#2566AF] py-2.5 px-4 text-sm font-medium text-white hover:bg-[#1e5294] transition-colors"
                     >
-                        Sign in with CAS Unistra
+                        Se connecter avec CAS Unistra
                     </button>
+                    <p className="mt-4 text-center text-xs text-gray-400">
+                        Vous serez redirigé vers le portail CAS de l&apos;Université de Strasbourg
+                    </p>
                 </div>
             </div>
         </div>
@@ -61,8 +48,8 @@ function SignInGeneric() {
 
 export default function SignInPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <SignInGeneric />
+        <Suspense fallback={<div className="text-center py-12 text-gray-400">Chargement...</div>}>
+            <SignInContent />
         </Suspense>
-    )
+    );
 }

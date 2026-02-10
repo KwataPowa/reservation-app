@@ -8,7 +8,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
     const session = await auth();
-    // @ts-ignore
     if (!session?.user || session.user.role !== 'ADMIN') {
         redirect('/');
     }
@@ -24,59 +23,58 @@ export default async function AdminPage() {
 
     return (
         <div className="space-y-8">
-            <div className="sm:flex sm:items-center sm:justify-between">
-                <h1 className="text-2xl font-bold leading-7 text-gray-900">
-                    Administration
-                </h1>
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-gray-900">Administration</h1>
                 <Link
                     href="/admin/materials/new"
-                    className="mt-4 sm:mt-0 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                    className="inline-flex items-center rounded-md bg-[#2566AF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e5294] transition-colors"
                 >
                     + Ajouter un matériel
                 </Link>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-                    <dt className="truncate text-sm font-medium text-gray-500">Matériels enregistrés</dt>
-                    <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{materialCount}</dd>
+            {/* Stats cards */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="bg-white rounded-lg border border-gray-200 p-5">
+                    <p className="text-sm font-medium text-gray-500">Matériels enregistrés</p>
+                    <p className="mt-1 text-3xl font-bold text-gray-900">{materialCount}</p>
                 </div>
-                <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-                    <dt className="truncate text-sm font-medium text-gray-500">Réservations en attente</dt>
-                    <dd className="mt-1 text-3xl font-semibold tracking-tight text-yellow-600">{pendingCount}</dd>
+                <div className="bg-white rounded-lg border border-gray-200 p-5">
+                    <p className="text-sm font-medium text-gray-500">En attente</p>
+                    <p className="mt-1 text-3xl font-bold text-yellow-600">{pendingCount}</p>
                 </div>
-                <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-                    <dt className="truncate text-sm font-medium text-gray-500">Réservations approuvées</dt>
-                    <dd className="mt-1 text-3xl font-semibold tracking-tight text-green-600">{approvedCount}</dd>
+                <div className="bg-white rounded-lg border border-gray-200 p-5">
+                    <p className="text-sm font-medium text-gray-500">Approuvées</p>
+                    <p className="mt-1 text-3xl font-bold text-green-600">{approvedCount}</p>
                 </div>
             </div>
 
             {/* Reservations Table */}
-            <div className="bg-white shadow sm:rounded-lg">
-                <div className="px-4 py-5 sm:px-6">
-                    <h2 className="text-lg font-medium leading-6 text-gray-900">
+            <div className="bg-white rounded-lg border border-gray-200">
+                <div className="px-5 py-4 border-b border-gray-200">
+                    <h2 className="text-lg font-semibold text-gray-900">
                         Toutes les réservations
                     </h2>
                 </div>
                 {reservations.length === 0 ? (
-                    <div className="px-4 py-12 text-center text-gray-500">
+                    <div className="px-5 py-12 text-center text-gray-400">
                         Aucune réservation pour le moment.
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-300">
+                        <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Matériel</th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Utilisateur</th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Dates</th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Motif</th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Statut</th>
-                                    <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Actions</th>
+                                    <th className="py-3 pl-5 pr-3 text-left text-xs font-semibold text-gray-500 uppercase">Matériel</th>
+                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Utilisateur</th>
+                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Dates</th>
+                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Motif</th>
+                                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Statut</th>
+                                    <th className="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200 bg-white">
+                            <tbody className="divide-y divide-gray-100 bg-white">
                                 {reservations.map((reservation) => (
                                     <AdminReservationActions
                                         key={reservation.id}

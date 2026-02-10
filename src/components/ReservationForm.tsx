@@ -20,12 +20,7 @@ export default function ReservationForm({ materialId, materialName }: { material
             const res = await fetch('/api/reservations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    materialId,
-                    startDate,
-                    endDate,
-                    purpose,
-                }),
+                body: JSON.stringify({ materialId, startDate, endDate, purpose }),
             });
 
             if (!res.ok) {
@@ -42,17 +37,15 @@ export default function ReservationForm({ materialId, materialName }: { material
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-                <label className="block text-sm font-medium text-gray-700">
-                    Matériel
-                </label>
-                <p className="mt-1 text-lg font-semibold text-gray-900">{materialName}</p>
+                <label className="block text-sm font-medium text-gray-600">Matériel</label>
+                <p className="mt-1 text-base font-semibold text-gray-900">{materialName}</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-600">
                         Date de début
                     </label>
                     <input
@@ -62,11 +55,11 @@ export default function ReservationForm({ materialId, materialName }: { material
                         onChange={(e) => setStartDate(e.target.value)}
                         required
                         min={new Date().toISOString().split('T')[0]}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
                     />
                 </div>
                 <div>
-                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-600">
                         Date de fin
                     </label>
                     <input
@@ -76,13 +69,13 @@ export default function ReservationForm({ materialId, materialName }: { material
                         onChange={(e) => setEndDate(e.target.value)}
                         required
                         min={startDate || new Date().toISOString().split('T')[0]}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
                     />
                 </div>
             </div>
 
             <div>
-                <label htmlFor="purpose" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="purpose" className="block text-sm font-medium text-gray-600">
                     Motif de la réservation
                 </label>
                 <textarea
@@ -91,30 +84,30 @@ export default function ReservationForm({ materialId, materialName }: { material
                     onChange={(e) => setPurpose(e.target.value)}
                     rows={3}
                     placeholder="Décrivez l'usage prévu du matériel..."
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
                 />
             </div>
 
             {error && (
-                <div className="rounded-md bg-red-50 p-4">
+                <div className="rounded-md bg-red-50 border border-red-200 p-3">
                     <p className="text-sm text-red-700">{error}</p>
                 </div>
             )}
 
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end gap-3">
                 <button
                     type="button"
                     onClick={() => router.back()}
-                    className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                    className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                     Annuler
                 </button>
                 <button
                     type="submit"
                     disabled={loading}
-                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                    className="rounded-md bg-[#2566AF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e5294] disabled:opacity-50 transition-colors"
                 >
-                    {loading ? 'Réservation en cours...' : 'Réserver'}
+                    {loading ? 'Réservation...' : 'Réserver'}
                 </button>
             </div>
         </form>

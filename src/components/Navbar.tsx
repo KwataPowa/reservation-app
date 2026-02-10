@@ -6,44 +6,45 @@ export default async function Navbar() {
     const user = session?.user;
 
     return (
-        <nav className="bg-white shadow">
+        <nav className="bg-white border-b border-gray-200 shadow-sm">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex h-16 justify-between">
-                    <div className="flex">
-                        <div className="flex flex-shrink-0 items-center">
-                            <Link href="/" className="text-xl font-bold text-indigo-600">
-                                ICUBE Resa
-                            </Link>
-                        </div>
-                        <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                <div className="flex h-16 justify-between items-center">
+                    {/* Logo + Nav links */}
+                    <div className="flex items-center space-x-8">
+                        <Link href="/" className="text-xl font-bold text-[#2566AF]">
+                            ICUBE Resa
+                        </Link>
+                        <div className="hidden sm:flex sm:space-x-6">
                             <Link
                                 href="/"
-                                className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                                className="text-sm font-medium text-gray-600 hover:text-[#2566AF] transition-colors"
                             >
                                 Matériel
                             </Link>
-                            {user?.role === 'ADMIN' && (
-                                <Link
-                                    href="/admin"
-                                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                                >
-                                    Admin
-                                </Link>
-                            )}
                             {user && (
                                 <Link
                                     href="/reservations"
-                                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                                    className="text-sm font-medium text-gray-600 hover:text-[#2566AF] transition-colors"
                                 >
                                     Mes Réservations
                                 </Link>
                             )}
+                            {user?.role === 'ADMIN' && (
+                                <Link
+                                    href="/admin"
+                                    className="text-sm font-medium text-gray-600 hover:text-[#2566AF] transition-colors"
+                                >
+                                    Administration
+                                </Link>
+                            )}
                         </div>
                     </div>
-                    <div className="hidden sm:ml-6 sm:flex sm:items-center">
+
+                    {/* Auth */}
+                    <div className="flex items-center">
                         {user ? (
                             <div className="flex items-center space-x-4">
-                                <span className="text-sm text-gray-700">{user.name}</span>
+                                <span className="text-sm text-gray-600">{user.name}</span>
                                 <form
                                     action={async () => {
                                         'use server';
@@ -52,18 +53,18 @@ export default async function Navbar() {
                                 >
                                     <button
                                         type="submit"
-                                        className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
-                                        Sign out
+                                        Déconnexion
                                     </button>
                                 </form>
                             </div>
                         ) : (
                             <Link
                                 href="/auth/signin"
-                                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                className="rounded-md bg-[#2566AF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e5294] transition-colors"
                             >
-                                Sign in
+                                Connexion
                             </Link>
                         )}
                     </div>

@@ -2,45 +2,64 @@ import prisma from "@/lib/prisma";
 import MaterialCard from "@/components/MaterialCard";
 import { auth } from "@/auth";
 
-export const dynamic = 'force-dynamic'; // Ensure fresh data on every request
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const session = await auth();
 
-  // Fetch materials
   const materials = await prisma.material.findMany({
     orderBy: { category: 'asc' }
   });
 
+  // Group materials by category
+  const grouped = materials.reduce((acc, mat) => {
+    const cat = mat.category || 'Autre';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(mat);
+    return acc;
+  }, {} as Record<string, typeof materials>);
+
   return (
-    <div className="space-y-6">
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-          Matériel ICUBE
-        </h1>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Matériel ICUBE
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {materials.length} équipement{materials.length > 1 ? 's' : ''} disponible{materials.length > 1 ? 's' : ''} à la réservation
+          </p>
+        </div>
         {session?.user?.role === 'ADMIN' && (
-          <div className="mt-4 flex sm:ml-4 sm:mt-0">
-            <a
-              href="/admin/materials/new"
-              className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Ajouter un matériel
-            </a>
-          </div>
+          <a
+            href="/admin/materials/new"
+            className="inline-flex items-center rounded-md bg-[#2566AF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e5294] transition-colors"
+          >
+            + Ajouter un matériel
+          </a>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {materials.length > 0 ? (
-          materials.map((material) => (
-            <MaterialCard key={material.id} material={material} />
-          ))
-        ) : (
-          <p className="text-gray-500 text-center col-span-full py-10">
-            Aucun matériel trouvé. (La base de données est peut-être vide ou non connectée)
-          </p>
-        )}
-      </div>
+      {/* Materials by category */}
+      {Object.entries(grouped).map(([category, items]) => (
+        <div key={category}>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+            {category}
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((material) => (
+              <MaterialCard key={material.id} material={material} />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {materials.length === 0 && (
+        <p className="text-gray-500 text-center py-12">
+          Aucun matériel trouvé.
+        </p>
+      )}
     </div>
   );
 }
