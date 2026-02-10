@@ -1,77 +1,76 @@
 import Link from 'next/link';
 import { auth, signOut } from '@/auth';
-import { Package, CalendarDays, FileText, ShieldCheck, LogOut, LogIn } from 'lucide-react';
+import { Package, CalendarDays, FileText, ShieldCheck, LogOut, LogIn, Menu } from 'lucide-react';
 
 export default async function Navbar() {
     const session = await auth();
     const user = session?.user;
 
     return (
-        <aside className="fixed top-0 left-0 h-full w-16 hover:w-56 bg-[#0F172A] text-white transition-all duration-300 z-50 overflow-hidden flex flex-col shadow-2xl group">
+        <header className="fixed top-0 left-0 right-0 h-16 bg-[#0F172A] border-b border-gray-800 z-50 flex items-center justify-between px-6 shadow-lg">
             {/* Logo */}
-            <div className="h-14 flex items-center px-4 border-b border-white/10">
-                <span className="font-bold text-lg tracking-tighter text-[#4A85C5] shrink-0 w-8 text-center">IC</span>
-                <span className="ml-3 font-bold text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    ICUBE RESA
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#2566AF] flex items-center justify-center rounded text-white font-bold text-xs tracking-tighter">
+                    IC
+                </div>
+                <span className="font-bold text-white tracking-tight hidden sm:inline-block">
+                    ICUBE <span className="text-[#4A85C5] font-light">RESA</span>
                 </span>
             </div>
 
-            {/* Nav */}
-            <nav className="flex-1 py-4 flex flex-col gap-0.5">
-                <NavItem href="/" icon={<Package size={18} />} label="Matériel" />
-                <NavItem href="/calendar" icon={<CalendarDays size={18} />} label="Planning" />
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-1">
+                <NavLink href="/" icon={<Package size={16} />} label="Matériel" />
+                <NavLink href="/calendar" icon={<CalendarDays size={16} />} label="Planning" />
                 {user && (
-                    <>
-                        <div className="my-3 border-t border-white/5 mx-4" />
-                        <NavItem href="/reservations" icon={<FileText size={18} />} label="Mes demandes" />
-                    </>
+                    <NavLink href="/reservations" icon={<FileText size={16} />} label="Mes demandes" />
                 )}
                 {user?.role === 'ADMIN' && (
-                    <NavItem href="/admin" icon={<ShieldCheck size={18} />} label="Administration" />
+                    <div className="ml-4 pl-4 border-l border-gray-700">
+                        <NavLink href="/admin" icon={<ShieldCheck size={16} />} label="Admin" highlight />
+                    </div>
                 )}
             </nav>
 
-            {/* User */}
-            <div className="p-3 border-t border-white/10">
+            {/* Mobile / User Menu */}
+            <div className="flex items-center gap-4">
                 {user ? (
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-xs font-bold shrink-0 text-[#4A85C5]">
-                                {user.name?.[0]?.toUpperCase() || 'U'}
-                            </div>
-                            <div className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 overflow-hidden">
-                                <p className="text-sm font-medium truncate">{user.name}</p>
-                                <p className="text-[10px] text-gray-500 truncate">{user.email}</p>
-                            </div>
+                    <div className="flex items-center gap-3">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-sm font-medium text-white leading-none">{user.name}</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5">{user.role === 'ADMIN' ? 'Administrateur' : 'Utilisateur'}</p>
+                        </div>
+                        <div className="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300 border border-gray-600">
+                            {user.name?.[0]?.toUpperCase() || 'U'}
                         </div>
                         <form action={async () => { 'use server'; await signOut(); }}>
-                            <button className="w-full flex items-center gap-3 text-gray-500 hover:text-red-400 transition-colors py-1.5">
-                                <LogOut size={16} className="shrink-0 ml-1" />
-                                <span className="text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Déconnexion</span>
+                            <button className="text-gray-400 hover:text-red-400 transition-colors p-2" title="Déconnexion">
+                                <LogOut size={18} />
                             </button>
                         </form>
                     </div>
                 ) : (
-                    <Link href="/auth/signin" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors py-1.5">
-                        <LogIn size={16} className="shrink-0 ml-1" />
-                        <span className="text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Connexion</span>
+                    <Link href="/auth/signin" className="flex items-center gap-2 text-sm font-medium text-white bg-[#2566AF] hover:bg-[#1A4B82] px-4 py-2 rounded transition-colors">
+                        <LogIn size={16} />
+                        Connexion
                     </Link>
                 )}
             </div>
-        </aside>
+        </header>
     );
 }
 
-function NavItem({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+function NavLink({ href, icon, label, highlight }: { href: string; icon: React.ReactNode; label: string; highlight?: boolean }) {
     return (
         <Link
             href={href}
-            className="flex items-center gap-3 px-4 py-2.5 text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+            className={`flex items-center gap-2 px-3 py-2 rounded text-sm font-medium transition-colors ${highlight
+                    ? 'text-blue-400 hover:bg-blue-500/10'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
         >
-            <span className="shrink-0 w-8 flex justify-center">{icon}</span>
-            <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {label}
-            </span>
+            {icon}
+            {label}
         </Link>
     );
 }

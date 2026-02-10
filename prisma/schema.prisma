@@ -1,11 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  role          Role      @default(USER)
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  reservations  Reservation[]
+}
+
+model Material {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  category      String?
+  location      String?
+  serialNumber  String?
+  budget        String?   // Ex: "IdEx Flavien 2022"
+  imageUrl      String?   // URL to image
+  components    Json?     // List of sub-items [{ name, serialNumber }]
+  status        Status    @default(AVAILABLE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  reservations  Reservation[]
+}
+
+model Reservation {
+  id          String    @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  purpose     String?
+  status      ReservationStatus @default(PENDING)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  materialId  String
+  material    Material  @relation(fields: [materialId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 enum Role {
@@ -13,7 +56,7 @@ enum Role {
   ADMIN
 }
 
-enum MaterialStatus {
+enum Status {
   AVAILABLE
   MAINTENANCE
   UNAVAILABLE
@@ -24,51 +67,4 @@ enum ReservationStatus {
   APPROVED
   REJECTED
   CANCELLED
-}
-
-model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String        @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role          @default(USER)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  reservations  Reservation[]
-
-  @@map("users")
-}
-
-model Material {
-  id           String         @id @default(cuid())
-  name         String
-  description  String?
-  serialNumber String?        @unique
-  location     String?
-  category     String?
-  status       MaterialStatus @default(AVAILABLE)
-  imageUrl     String?        // Link to image if available
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  reservations Reservation[]
-
-  @@map("materials")
-}
-
-model Reservation {
-  id         String            @id @default(cuid())
-  userId     String
-  materialId String
-  startDate  DateTime
-  endDate    DateTime
-  status     ReservationStatus @default(PENDING)
-  purpose    String?           // Reason for reservation
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-
-  user     User     @relation(fields: [userId], references: [id])
-  material Material @relation(fields: [materialId], references: [id])
-
-  @@map("reservations")
 }

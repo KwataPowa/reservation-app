@@ -14,10 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className="min-h-screen bg-[#F1F5F9] flex">
+      <body className="min-h-screen bg-[#F1F5F9]" style={{ paddingTop: '4rem' }}>
         <Navbar />
-        {/* Main content shifted right to accommodate sidebar */}
-        <main className="flex-1 ml-16 transition-all duration-300 p-8 w-full max-w-[1920px]">
+        <main className="p-8 w-full max-w-7xl mx-auto animate-in fade-in duration-500">
           {children}
         </main>
       </body>
