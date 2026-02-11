@@ -2,8 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { CalendarDays, Clock, CheckCircle, XCircle, Ban, PackageCheck, AlertTriangle } from 'lucide-react';
+import { CalendarDays, PackageCheck, AlertTriangle, Package } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { reservationStatusConfig, formatDate, type ReservationStatus } from '@/lib/constants';
 import ReturnMaterialModal from '@/components/ReturnMaterialModal';
+import CancelReservationDialog from '@/components/reservations/CancelReservationDialog';
+import EmptyState from '@/components/shared/EmptyState';
 
 interface SerializedReservation {
     id: string;
@@ -17,94 +24,160 @@ interface SerializedReservation {
     materialName: string;
 }
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-    PENDING: { label: 'En attente', color: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={12} /> },
-    APPROVED: { label: 'Approuvée', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle size={12} /> },
-    REJECTED: { label: 'Refusée', color: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={12} /> },
-    CANCELLED: { label: 'Annulée', color: 'bg-gray-50 text-gray-600 border-gray-200', icon: <Ban size={12} /> },
-    RETURNED: { label: 'Rendu', color: 'bg-blue-50 text-blue-700 border-blue-200', icon: <PackageCheck size={12} /> },
-};
-
 export default function MyReservationsList({ reservations }: { reservations: SerializedReservation[] }) {
     const [returnModal, setReturnModal] = useState<{ id: string; materialName: string } | null>(null);
+    const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'PAST'>('ALL');
 
     const canReturn = (reservation: SerializedReservation) => {
         if (reservation.status !== 'APPROVED') return false;
-        const now = new Date();
-        const startDate = new Date(reservation.startDate);
-        return now >= startDate;
+        return new Date() >= new Date(reservation.startDate);
     };
+
+    const canCancel = (reservation: SerializedReservation) => {
+        return ['PENDING', 'APPROVED'].includes(reservation.status);
+    };
+
+    const filtered = reservations.filter((r) => {
+        if (filter === 'ACTIVE') return ['PENDING', 'APPROVED'].includes(r.status);
+        if (filter === 'PAST') return ['REJECTED', 'CANCELLED', 'RETURNED'].includes(r.status);
+        return true;
+    });
+
+    const filters = [
+        { key: 'ALL' as const, label: 'Toutes', count: reservations.length },
+        { key: 'ACTIVE' as const, label: 'En cours', count: reservations.filter(r => ['PENDING', 'APPROVED'].includes(r.status)).length },
+        { key: 'PAST' as const, label: 'Terminées', count: reservations.filter(r => ['REJECTED', 'CANCELLED', 'RETURNED'].includes(r.status)).length },
+    ];
+
+    if (reservations.length === 0) {
+        return (
+            <EmptyState
+                icon={<Package className="h-5 w-5" />}
+                title="Aucune réservation"
+                description="Vous n'avez pas encore de réservation."
+            >
+                <Button asChild variant="outline" size="sm">
+                    <Link href="/">Parcourir le matériel</Link>
+                </Button>
+            </EmptyState>
+        );
+    }
 
     return (
         <>
-            {reservations.length === 0 ? (
-                <div className="bg-white border border-gray-200 text-center py-12">
-                    <p className="text-gray-400 text-sm mb-3">Aucune réservation enregistrée.</p>
-                    <Link href="/" className="text-sm font-medium text-[#2566AF] hover:text-[#1A4B82]">
-                        Parcourir le matériel
-                    </Link>
-                </div>
-            ) : (
-                <div className="bg-white border border-gray-200 divide-y divide-gray-100">
-                    {reservations.map((reservation) => {
-                        const config = statusConfig[reservation.status] || statusConfig.PENDING;
-                        return (
-                            <div key={reservation.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-gray-900">
-                                        {reservation.materialName}
-                                    </p>
-                                    <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
-                                        <span className="inline-flex items-center gap-1.5">
-                                            <CalendarDays size={12} className="text-gray-400" />
-                                            {new Date(reservation.startDate).toLocaleDateString('fr-FR')} — {new Date(reservation.endDate).toLocaleDateString('fr-FR')}
-                                        </span>
-                                        {reservation.purpose && (
-                                            <span className="text-gray-400 truncate max-w-[250px]">{reservation.purpose}</span>
-                                        )}
-                                    </div>
-                                    {/* Return info */}
-                                    {reservation.status === 'RETURNED' && (
-                                        <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
-                                            {reservation.returnedAt && (
-                                                <span className="text-blue-600">
-                                                    Rendu le {new Date(reservation.returnedAt).toLocaleDateString('fr-FR')}
-                                                </span>
-                                            )}
-                                            {reservation.returnHasIssue && (
-                                                <span className="inline-flex items-center gap-1 text-red-600 font-medium">
-                                                    <AlertTriangle size={11} />
-                                                    Problème signalé
-                                                </span>
-                                            )}
-                                            {reservation.returnNote && (
-                                                <span className="text-gray-500 italic truncate max-w-[300px]" title={reservation.returnNote}>
-                                                    — {reservation.returnNote}
-                                                </span>
+            {/* Tabs */}
+            <div className="flex gap-1 mb-4">
+                {filters.map((f) => (
+                    <button
+                        key={f.key}
+                        onClick={() => setFilter(f.key)}
+                        className={cn(
+                            'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
+                            filter === f.key
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground hover:bg-accent'
+                        )}
+                    >
+                        {f.label}
+                        <span className={cn(
+                            'ml-1.5 text-xs',
+                            filter === f.key ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                        )}>
+                            {f.count}
+                        </span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Reservation cards */}
+            <div className="space-y-3">
+                {filtered.map((reservation) => {
+                    const config = reservationStatusConfig[reservation.status as ReservationStatus];
+                    const StatusIcon = config?.icon;
+
+                    return (
+                        <Card key={reservation.id} className="overflow-hidden">
+                            <CardContent className="p-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div className="flex-1 min-w-0 space-y-1.5">
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-sm font-semibold text-foreground">
+                                                {reservation.materialName}
+                                            </p>
+                                            {config && (
+                                                <Badge variant="outline" className={cn('text-[11px] gap-1', config.className)}>
+                                                    {StatusIcon && <StatusIcon className="h-3 w-3" />}
+                                                    {config.label}
+                                                </Badge>
                                             )}
                                         </div>
-                                    )}
+
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <CalendarDays className="h-3 w-3" />
+                                                {formatDate(reservation.startDate)} — {formatDate(reservation.endDate)}
+                                            </span>
+                                            {reservation.purpose && (
+                                                <span className="truncate max-w-[250px]">{reservation.purpose}</span>
+                                            )}
+                                        </div>
+
+                                        {/* Return info */}
+                                        {reservation.status === 'RETURNED' && (
+                                            <div className="flex flex-wrap items-center gap-2 text-xs">
+                                                {reservation.returnedAt && (
+                                                    <span className="text-blue-600">
+                                                        Rendu le {formatDate(reservation.returnedAt)}
+                                                    </span>
+                                                )}
+                                                {reservation.returnHasIssue && (
+                                                    <span className="inline-flex items-center gap-1 text-destructive font-medium">
+                                                        <AlertTriangle className="h-3 w-3" />
+                                                        Problème signalé
+                                                    </span>
+                                                )}
+                                                {reservation.returnNote && (
+                                                    <span className="text-muted-foreground italic truncate max-w-[300px]" title={reservation.returnNote}>
+                                                        — {reservation.returnNote}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        {canCancel(reservation) && (
+                                            <CancelReservationDialog
+                                                reservationId={reservation.id}
+                                                materialName={reservation.materialName}
+                                                status={reservation.status}
+                                            />
+                                        )}
+                                        {canReturn(reservation) && (
+                                            <Button
+                                                size="sm"
+                                                className="gap-1.5"
+                                                onClick={() => setReturnModal({ id: reservation.id, materialName: reservation.materialName })}
+                                            >
+                                                <PackageCheck className="h-3.5 w-3.5" />
+                                                Rendre
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-3 shrink-0 ml-4">
-                                    <span className={`inline-flex items-center gap-1.5 border px-2.5 py-0.5 text-xs font-medium ${config.color}`}>
-                                        {config.icon}
-                                        {config.label}
-                                    </span>
-                                    {canReturn(reservation) && (
-                                        <button
-                                            onClick={() => setReturnModal({ id: reservation.id, materialName: reservation.materialName })}
-                                            className="inline-flex items-center gap-1.5 bg-[#2566AF] text-white px-3 py-1.5 text-xs font-semibold rounded hover:bg-[#1A4B82] transition-colors shadow-sm"
-                                        >
-                                            <PackageCheck size={13} />
-                                            Rendre
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
+                            </CardContent>
+                        </Card>
+                    );
+                })}
+
+                {filtered.length === 0 && (
+                    <EmptyState
+                        title="Aucune réservation dans cette catégorie"
+                        description="Changez de filtre pour voir d'autres réservations."
+                    />
+                )}
+            </div>
 
             {/* Return Modal */}
             {returnModal && (

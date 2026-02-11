@@ -2,8 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, X, Clock, CheckCircle, XCircle, Ban, AlertCircle, MapPin, PackageCheck, AlertTriangle } from 'lucide-react';
+import { Check, X, MapPin, PackageCheck, AlertTriangle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { reservationStatusConfig, formatDate, type ReservationStatus } from '@/lib/constants';
 import ReturnMaterialModal from '@/components/ReturnMaterialModal';
+import CancelReservationDialog from '@/components/reservations/CancelReservationDialog';
+import { toast } from 'sonner';
 
 interface Reservation {
     id: string;
@@ -20,24 +27,14 @@ interface Reservation {
     material: { name: string; category: string | null };
 }
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-    PENDING: { label: 'En attente', color: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={12} /> },
-    APPROVED: { label: 'Approuvée', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle size={12} /> },
-    REJECTED: { label: 'Refusée', color: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={12} /> },
-    CANCELLED: { label: 'Annulée', color: 'bg-gray-50 text-gray-600 border-gray-200', icon: <Ban size={12} /> },
-    RETURNED: { label: 'Rendu', color: 'bg-blue-50 text-blue-700 border-blue-200', icon: <PackageCheck size={12} /> },
-};
-
 export default function AdminReservationActions({ reservation }: { reservation: Reservation }) {
     const router = useRouter();
     const [status, setStatus] = useState(reservation.status);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [showReturnModal, setShowReturnModal] = useState(false);
 
     const handleAction = async (newStatus: 'APPROVED' | 'REJECTED') => {
         setLoading(true);
-        setError('');
         try {
             const res = await fetch(`/api/admin/reservations/${reservation.id}`, {
                 method: 'PATCH',
@@ -47,103 +44,135 @@ export default function AdminReservationActions({ reservation }: { reservation: 
 
             if (res.ok) {
                 setStatus(newStatus);
+                toast.success(newStatus === 'APPROVED' ? 'Réservation approuvée' : 'Réservation refusée');
                 router.refresh();
             } else {
                 const data = await res.json();
-                setError(data.error || 'Erreur inconnue');
+                toast.error('Erreur', { description: data.error || 'Erreur inconnue' });
             }
-        } catch (err) {
-            setError('Erreur réseau');
+        } catch {
+            toast.error('Erreur réseau');
         } finally {
             setLoading(false);
         }
     };
 
-    const config = statusConfig[status] || statusConfig.PENDING;
+    const config = reservationStatusConfig[status as ReservationStatus];
+    const StatusIcon = config?.icon;
 
     return (
         <>
-            <tr className="hover:bg-gray-50/50 transition-colors">
-                <td className="whitespace-nowrap py-3 pl-6 pr-3 text-sm font-medium text-gray-900">
-                    {reservation.material.name}
-                    {reservation.material.category && (
-                        <span className="block text-[10px] text-gray-400 font-normal mt-0.5">{reservation.material.category}</span>
-                    )}
-                </td>
-                <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-600">
-                    <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">{reservation.user.name || 'Sans nom'}</span>
-                        <a href={`mailto:${reservation.user.email}`} className="text-xs text-blue-600 hover:underline">{reservation.user.email}</a>
-                        {reservation.location && (
-                            <span className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1">
-                                <MapPin size={10} /> {reservation.location}
-                            </span>
-                        )}
-                    </div>
-                </td>
-                <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
-                    <div className="flex flex-col gap-1">
-                        <span className="lab-mono">
-                            {new Date(reservation.startDate).toLocaleDateString('fr-FR')} → {new Date(reservation.endDate).toLocaleDateString('fr-FR')}
-                        </span>
-                        <span className={`inline-flex items-center gap-1.5 border px-2 py-0.5 text-xs font-medium rounded w-fit ${config.color}`}>
-                            {config.icon}
-                            {config.label}
-                        </span>
-                        {/* Return info */}
-                        {status === 'RETURNED' && reservation.returnedAt && (
-                            <span className="text-[10px] text-blue-600">
-                                Rendu le {new Date(reservation.returnedAt).toLocaleDateString('fr-FR')}
-                            </span>
-                        )}
-                        {status === 'RETURNED' && reservation.returnHasIssue && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-red-600 font-medium">
-                                <AlertTriangle size={10} />
-                                Problème : {reservation.returnNote || 'Non précisé'}
-                            </span>
-                        )}
-                    </div>
-                </td>
-                <td className="px-3 py-3 text-sm text-gray-500 max-w-[200px] truncate" title={reservation.purpose || ''}>
-                    {reservation.purpose || '—'}
-                </td>
-                <td className="whitespace-nowrap px-3 py-3 text-sm text-right pr-6">
-                    {error ? (
-                        <span className="text-xs text-red-600 flex items-center justify-end gap-1">
-                            <AlertCircle size={12} /> {error}
-                        </span>
-                    ) : status === 'PENDING' ? (
-                        <div className="flex gap-2 justify-end">
-                            <button
-                                onClick={() => handleAction('APPROVED')}
-                                disabled={loading}
-                                className="inline-flex items-center gap-1 bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors rounded shadow-sm"
-                            >
-                                <Check size={13} />
-                                Valider
-                            </button>
-                            <button
-                                onClick={() => handleAction('REJECTED')}
-                                disabled={loading}
-                                className="inline-flex items-center gap-1 bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors rounded shadow-sm"
-                            >
-                                <X size={13} />
-                                Refuser
-                            </button>
-                        </div>
-                    ) : status === 'APPROVED' ? (
-                        <button
-                            onClick={() => setShowReturnModal(true)}
-                            className="inline-flex items-center gap-1.5 bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors rounded shadow-sm"
-                        >
-                            <PackageCheck size={13} />
-                            Forcer le retour
-                        </button>
-                    ) : null}
-                </td>
-            </tr>
+            <Card className="overflow-hidden">
+                <CardContent className="p-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                        {/* Info */}
+                        <div className="flex-1 min-w-0 space-y-1.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-sm font-semibold text-foreground">
+                                    {reservation.material.name}
+                                </p>
+                                {reservation.material.category && (
+                                    <span className="text-[11px] text-muted-foreground">
+                                        {reservation.material.category}
+                                    </span>
+                                )}
+                                {config && (
+                                    <Badge variant="outline" className={cn('text-[11px] gap-1', config.className)}>
+                                        {StatusIcon && <StatusIcon className="h-3 w-3" />}
+                                        {config.label}
+                                    </Badge>
+                                )}
+                            </div>
 
-            {/* Return Modal */}
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                                <span className="font-medium text-foreground">
+                                    {reservation.user.name || 'Sans nom'}
+                                </span>
+                                <a href={`mailto:${reservation.user.email}`} className="text-primary hover:underline">
+                                    {reservation.user.email}
+                                </a>
+                                {reservation.location && (
+                                    <span className="inline-flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" /> {reservation.location}
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                                <span className="lab-mono">
+                                    {formatDate(reservation.startDate)} → {formatDate(reservation.endDate)}
+                                </span>
+                                {reservation.purpose && (
+                                    <span className="truncate max-w-[300px]">{reservation.purpose}</span>
+                                )}
+                            </div>
+
+                            {/* Return info */}
+                            {status === 'RETURNED' && (
+                                <div className="flex flex-wrap items-center gap-2 text-xs">
+                                    {reservation.returnedAt && (
+                                        <span className="text-blue-600">
+                                            Rendu le {formatDate(reservation.returnedAt)}
+                                        </span>
+                                    )}
+                                    {reservation.returnHasIssue && (
+                                        <span className="inline-flex items-center gap-1 text-destructive font-medium">
+                                            <AlertTriangle className="h-3 w-3" />
+                                            {reservation.returnNote || 'Problème signalé'}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 shrink-0">
+                            {status === 'PENDING' && (
+                                <>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => handleAction('APPROVED')}
+                                        disabled={loading}
+                                        className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
+                                    >
+                                        <Check className="h-3.5 w-3.5" />
+                                        Valider
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => handleAction('REJECTED')}
+                                        disabled={loading}
+                                        className="gap-1.5"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                        Refuser
+                                    </Button>
+                                </>
+                            )}
+                            {status === 'APPROVED' && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowReturnModal(true)}
+                                    className="gap-1.5"
+                                >
+                                    <PackageCheck className="h-3.5 w-3.5" />
+                                    Forcer retour
+                                </Button>
+                            )}
+                            {['PENDING', 'APPROVED'].includes(status) && (
+                                <CancelReservationDialog
+                                    reservationId={reservation.id}
+                                    materialName={reservation.material.name}
+                                    status={status}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             {showReturnModal && (
                 <ReturnMaterialModal
                     isOpen={true}

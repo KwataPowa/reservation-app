@@ -2,7 +2,20 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Box, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Box, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { MATERIAL_CATEGORIES } from '@/lib/constants';
 
 export interface MaterialFormData {
     name: string;
@@ -38,14 +51,6 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
         components: [],
     });
 
-    const categories = [
-        'Casques',
-        'Boîtiers mesures physiologiques',
-        'Autres',
-        'Trackers',
-        'Accessoires',
-    ];
-
     const addComponent = () => {
         setForm({
             ...form,
@@ -80,214 +85,209 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
     };
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="px-6 py-5 border-b border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900">
-                    {isEditing ? 'Modifier le matériel' : 'Ajouter un matériel'}
-                </h2>
-                <p className="text-xs text-gray-500 mt-1">
-                    {isEditing ? 'Mettez à jour les informations.' : 'Remplissez les informations techniques et l\'inventaire des composants.'}
-                </p>
-            </div>
+        <Card>
+            <CardContent className="p-0">
+                <div className="px-6 py-5 border-b">
+                    <h2 className="text-lg font-bold text-foreground">
+                        {isEditing ? 'Modifier le matériel' : 'Ajouter un matériel'}
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        {isEditing ? 'Mettez à jour les informations.' : 'Remplissez les informations techniques et l\'inventaire des composants.'}
+                    </p>
+                </div>
 
-            <div className="px-6 py-5">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Information Générale */}
-                    <div className="space-y-4">
-                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2">Informations Générales</h3>
-                        <div>
-                            <label htmlFor="name" className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom *</label>
-                            <input
-                                type="text"
-                                id="name"
-                                required
-                                value={form.name}
-                                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
-                                placeholder="Ex: HTC Vive Pro Eye"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="description" className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
-                            <textarea
-                                id="description"
-                                value={form.description}
-                                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                                rows={3}
-                                className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <label htmlFor="serialNumber" className="block text-xs font-bold text-gray-500 uppercase mb-1">N° de série (Principal)</label>
-                                <input
+                <div className="px-6 py-5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Information Générale */}
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider border-b pb-2">Informations Générales</h3>
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Nom *</Label>
+                                <Input
                                     type="text"
-                                    id="serialNumber"
-                                    value={form.serialNumber}
-                                    onChange={(e) => setForm({ ...form, serialNumber: e.target.value })}
-                                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF] font-mono"
+                                    id="name"
+                                    required
+                                    value={form.name}
+                                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                    placeholder="Ex: HTC Vive Pro Eye"
                                 />
                             </div>
-                            <div>
-                                <label htmlFor="budget" className="block text-xs font-bold text-gray-500 uppercase mb-1">Budget / Financement</label>
-                                <input
-                                    type="text"
-                                    id="budget"
-                                    value={form.budget}
-                                    onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
-                                    placeholder="Ex: IdEx Flavien 2022"
+
+                            <div className="space-y-2">
+                                <Label htmlFor="description">Description</Label>
+                                <Textarea
+                                    id="description"
+                                    value={form.description}
+                                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                                    rows={3}
                                 />
                             </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <label htmlFor="imageUrl" className="block text-xs font-bold text-gray-500 uppercase mb-1">URL Image</label>
-                                <div className="flex items-center gap-2">
-                                    <div className="relative flex-grow">
-                                        <ImageIcon size={16} className="absolute left-3 top-2.5 text-gray-400" />
-                                        <input
-                                            type="url"
-                                            id="imageUrl"
-                                            value={form.imageUrl}
-                                            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                                            className="w-full rounded border border-gray-300 pl-9 pr-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
-                                            placeholder="https://..."
-                                        />
-                                    </div>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="serialNumber">N° de série (Principal)</Label>
+                                    <Input
+                                        type="text"
+                                        id="serialNumber"
+                                        value={form.serialNumber}
+                                        onChange={(e) => setForm({ ...form, serialNumber: e.target.value })}
+                                        className="font-mono"
+                                    />
                                 </div>
-                                <p className="text-[10px] text-gray-400 mt-1">Lien direct vers une image du matériel.</p>
+                                <div className="space-y-2">
+                                    <Label htmlFor="budget">Budget / Financement</Label>
+                                    <Input
+                                        type="text"
+                                        id="budget"
+                                        value={form.budget}
+                                        onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                                        placeholder="Ex: IdEx Flavien 2022"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="imageUrl">URL Image</Label>
+                                <div className="relative">
+                                    <ImageIcon size={16} className="absolute left-3 top-2.5 text-muted-foreground" />
+                                    <Input
+                                        type="url"
+                                        id="imageUrl"
+                                        value={form.imageUrl}
+                                        onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                                        className="pl-9"
+                                        placeholder="https://..."
+                                    />
+                                </div>
+                                <p className="text-[10px] text-muted-foreground">Lien direct vers une image du matériel.</p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Classification */}
-                    <div className="space-y-4 pt-4">
-                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2">Classification & Statut</h3>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <div>
-                                <label htmlFor="location" className="block text-xs font-bold text-gray-500 uppercase mb-1">Emplacement</label>
-                                <input
-                                    type="text"
-                                    id="location"
-                                    value={form.location}
-                                    onChange={(e) => setForm({ ...form, location: e.target.value })}
-                                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
-                                />
+                        {/* Classification */}
+                        <div className="space-y-4 pt-4">
+                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider border-b pb-2">Classification & Statut</h3>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                <div className="space-y-2">
+                                    <Label htmlFor="location">Emplacement</Label>
+                                    <Input
+                                        type="text"
+                                        id="location"
+                                        value={form.location}
+                                        onChange={(e) => setForm({ ...form, location: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Catégorie</Label>
+                                    <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {MATERIAL_CATEGORIES.map((cat) => (
+                                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Statut Initial</Label>
+                                    <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="AVAILABLE">Disponible</SelectItem>
+                                            <SelectItem value="MAINTENANCE">En maintenance</SelectItem>
+                                            <SelectItem value="UNAVAILABLE">Indisponible</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
-                            <div>
-                                <label htmlFor="category" className="block text-xs font-bold text-gray-500 uppercase mb-1">Catégorie</label>
-                                <select
-                                    id="category"
-                                    value={form.category}
-                                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
+                        </div>
+
+                        {/* Composants / Sous-équipements */}
+                        <div className="space-y-4 pt-4">
+                            <div className="flex items-center justify-between border-b pb-2">
+                                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                                    <Box size={16} /> Composants du Kit
+                                </h3>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={addComponent}
+                                    className="gap-1 text-xs"
                                 >
-                                    {categories.map((cat) => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
+                                    <Plus size={14} /> Ajouter un composant
+                                </Button>
                             </div>
-                            <div>
-                                <label htmlFor="status" className="block text-xs font-bold text-gray-500 uppercase mb-1">Statut Initial</label>
-                                <select
-                                    id="status"
-                                    value={form.status}
-                                    onChange={(e) => setForm({ ...form, status: e.target.value })}
-                                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
-                                >
-                                    <option value="AVAILABLE">Disponible</option>
-                                    <option value="MAINTENANCE">En maintenance</option>
-                                    <option value="UNAVAILABLE">Indisponible</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Composants / Sous-équipements */}
-                    <div className="space-y-4 pt-4">
-                        <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                                <Box size={16} /> Composants du Kit
-                            </h3>
-                            <button
-                                type="button"
-                                onClick={addComponent}
-                                className="flex items-center gap-1 text-xs font-bold text-[#2566AF] hover:text-[#1e5294] transition-colors"
-                            >
-                                <Plus size={14} /> AJOUTER UN COMPOSANT
-                            </button>
-                        </div>
-
-                        {form.components.length === 0 ? (
-                            <div className="text-center py-6 bg-gray-50 border border-dashed border-gray-200 rounded text-gray-400 text-sm">
-                                Aucun composant ajouté (ex: manettes, câbles, stations...).
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {form.components.map((comp, idx) => (
-                                    <div key={idx} className="flex items-start gap-3 bg-gray-50 p-3 rounded border border-gray-100">
-                                        <span className="text-xs font-bold text-gray-400 mt-2.5">#{idx + 1}</span>
-                                        <div className="flex-grow grid grid-cols-2 gap-3">
-                                            <div>
-                                                <input
+                            {form.components.length === 0 ? (
+                                <div className="text-center py-6 bg-muted/50 border border-dashed rounded-lg text-muted-foreground text-sm">
+                                    Aucun composant ajouté (ex: manettes, câbles, stations...).
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {form.components.map((comp, idx) => (
+                                        <div key={idx} className="flex items-start gap-3 bg-muted/50 p-3 rounded-lg border">
+                                            <span className="text-xs font-bold text-muted-foreground mt-2.5">#{idx + 1}</span>
+                                            <div className="flex-grow grid grid-cols-2 gap-3">
+                                                <Input
                                                     type="text"
-                                                    placeholder="Nom de l'élément (ex: Manette Droite)"
+                                                    placeholder="Nom (ex: Manette Droite)"
                                                     value={comp.name}
                                                     onChange={(e) => updateComponent(idx, 'name', e.target.value)}
-                                                    className="w-full rounded border border-gray-300 px-2 py-1.5 text-xs focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
+                                                    className="text-xs h-8"
                                                 />
-                                            </div>
-                                            <div>
-                                                <input
+                                                <Input
                                                     type="text"
                                                     placeholder="N° de série"
                                                     value={comp.serialNumber}
                                                     onChange={(e) => updateComponent(idx, 'serialNumber', e.target.value)}
-                                                    className="w-full rounded border border-gray-300 px-2 py-1.5 text-xs focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF] font-mono"
+                                                    className="text-xs h-8 font-mono"
                                                 />
                                             </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                                onClick={() => removeComponent(idx)}
+                                                aria-label="Supprimer le composant"
+                                            >
+                                                <Trash2 size={16} />
+                                            </Button>
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeComponent(idx)}
-                                            className="text-gray-400 hover:text-red-500 mt-1.5"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {error && (
+                            <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 flex items-start gap-2">
+                                <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                                <p className="text-sm text-destructive">{error}</p>
                             </div>
                         )}
-                    </div>
 
-                    {error && (
-                        <div className="rounded-md bg-red-50 border border-red-200 p-3">
-                            <p className="text-sm text-red-700">{error}</p>
+                        <div className="flex justify-end gap-3 pt-4 border-t">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => router.back()}
+                            >
+                                Annuler
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                            >
+                                {loading ? 'Enregistrement...' : (isEditing ? 'Mettre à jour' : 'Enregistrer le matériel')}
+                            </Button>
                         </div>
-                    )}
-
-                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                        <button
-                            type="button"
-                            onClick={() => router.back()}
-                            className="rounded bg-white border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors uppercase tracking-wide"
-                        >
-                            Annuler
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="rounded bg-[#2566AF] px-4 py-2 text-sm font-bold text-white hover:bg-[#1e5294] disabled:opacity-50 transition-colors uppercase tracking-wide shadow-sm"
-                        >
-                            {loading ? 'Enregistrement...' : (isEditing ? 'Mettre à jour' : 'Enregistrer le matériel')}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                    </form>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

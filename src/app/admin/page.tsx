@@ -2,8 +2,12 @@ import prisma from '@/lib/prisma';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import AdminReservationActions from '@/components/AdminReservationActions';
+import PageHeader from '@/components/shared/PageHeader';
+import EmptyState from '@/components/shared/EmptyState';
 import Link from 'next/link';
-import { Plus, Package, Clock, CheckCircle, Edit } from 'lucide-react';
+import { Plus, Package, Clock, CheckCircle, FileText } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,95 +23,93 @@ export default async function AdminPage() {
         orderBy: { createdAt: 'desc' },
     });
 
-    const materials = await prisma.material.findMany({
-        orderBy: { name: 'asc' },
-    });
-
-    const materialCount = materials.length;
+    const materialCount = await prisma.material.count();
     const pendingCount = reservations.filter(r => r.status === 'PENDING').length;
     const approvedCount = reservations.filter(r => r.status === 'APPROVED').length;
 
     return (
-        <div className="space-y-8">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Administration</h1>
-                    <p className="mt-1 text-xs text-gray-500 lab-mono">GESTION DES RESSOURCES ET DEMANDES</p>
-                </div>
-                <Link
-                    href="/admin/materials/new"
-                    className="inline-flex items-center gap-2 bg-[#2566AF] text-white px-4 py-2 text-sm font-semibold hover:bg-[#1A4B82] transition-colors"
-                >
-                    <Plus size={16} />
-                    Nouveau matériel
-                </Link>
-            </div>
+        <div className="space-y-6">
+            <PageHeader
+                title="Administration"
+                subtitle="Gestion des ressources et des demandes"
+            >
+                <Button asChild className="gap-2">
+                    <Link href="/admin/materials/new">
+                        <Plus className="h-4 w-4" />
+                        Nouveau matériel
+                    </Link>
+                </Button>
+            </PageHeader>
 
             {/* KPIs */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <StatCard label="Total équipements" value={materialCount} icon={<Package size={20} className="text-gray-300" />} />
-                <StatCard label="En attente" value={pendingCount} icon={<Clock size={20} className="text-amber-300" />} valueColor="text-amber-600" />
-                <StatCard label="Actives" value={approvedCount} icon={<CheckCircle size={20} className="text-emerald-300" />} valueColor="text-emerald-600" />
+                <Card>
+                    <CardContent className="p-5 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-medium text-muted-foreground">Total équipements</p>
+                            <p className="text-2xl font-bold lab-mono mt-1">{materialCount}</p>
+                        </div>
+                        <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                            <Package className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-5 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-medium text-muted-foreground">En attente</p>
+                            <p className="text-2xl font-bold lab-mono mt-1 text-amber-600">{pendingCount}</p>
+                        </div>
+                        <div className="h-10 w-10 rounded-lg bg-amber-50 flex items-center justify-center">
+                            <Clock className="h-5 w-5 text-amber-500" />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-5 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-medium text-muted-foreground">Actives</p>
+                            <p className="text-2xl font-bold lab-mono mt-1 text-emerald-600">{approvedCount}</p>
+                        </div>
+                        <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                            <CheckCircle className="h-5 w-5 text-emerald-500" />
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
-            {/* Reservations Table */}
-            <div className="bg-white border border-gray-200 shadow-sm flex flex-col h-full">
-                <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/80 flex justify-between items-center">
-                    <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Dernières Réservations</h2>
-                    <span className="text-xs lab-mono text-gray-400">{reservations.length}</span>
+            {/* Reservations list */}
+            <div>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-semibold text-foreground">Réservations</h2>
+                    <span className="text-xs text-muted-foreground lab-mono">{reservations.length} total</span>
                 </div>
 
                 {reservations.length === 0 ? (
-                    <div className="p-12 text-center flex-grow flex items-center justify-center">
-                        <p className="text-gray-400 text-sm">Aucune réservation.</p>
-                    </div>
+                    <EmptyState
+                        icon={<FileText className="h-5 w-5" />}
+                        title="Aucune réservation"
+                        description="Les demandes de réservation apparaîtront ici."
+                    />
                 ) : (
-                    <div className="overflow-x-auto flex-grow">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Détails</th>
-                                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Demandeur</th>
-                                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Date/Statut</th>
-                                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Motif</th>
-                                    <th className="px-4 py-3 text-right text-[10px] font-bold text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {reservations.map((reservation) => (
-                                    <AdminReservationActions
-                                        key={reservation.id}
-                                        reservation={{
-                                            ...reservation,
-                                            startDate: reservation.startDate.toISOString(),
-                                            endDate: reservation.endDate.toISOString(),
-                                            createdAt: reservation.createdAt.toISOString(),
-                                            returnedAt: reservation.returnedAt?.toISOString() || null,
-                                            user: { name: reservation.user.name, email: reservation.user.email },
-                                            material: { name: reservation.material.name, category: reservation.material.category },
-                                        }}
-                                    />
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="space-y-3">
+                        {reservations.map((reservation) => (
+                            <AdminReservationActions
+                                key={reservation.id}
+                                reservation={{
+                                    ...reservation,
+                                    startDate: reservation.startDate.toISOString(),
+                                    endDate: reservation.endDate.toISOString(),
+                                    createdAt: reservation.createdAt.toISOString(),
+                                    returnedAt: reservation.returnedAt?.toISOString() || null,
+                                    user: { name: reservation.user.name, email: reservation.user.email },
+                                    material: { name: reservation.material.name, category: reservation.material.category },
+                                }}
+                            />
+                        ))}
                     </div>
                 )}
             </div>
-        </div>
-    );
-}
-
-
-
-function StatCard({ label, value, icon, valueColor = "text-gray-900" }: { label: string; value: number; icon: React.ReactNode; valueColor?: string }) {
-    return (
-        <div className="bg-white border border-gray-200 shadow-sm p-5 flex items-center justify-between">
-            <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</p>
-                <p className={`mt-1 text-3xl font-bold lab-mono ${valueColor}`}>{value}</p>
-            </div>
-            {icon}
         </div>
     );
 }

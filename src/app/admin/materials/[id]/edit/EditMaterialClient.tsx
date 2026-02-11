@@ -1,7 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import MaterialForm, { MaterialFormData } from '@/components/MaterialForm';
+import { Button } from '@/components/ui/button';
 
 export default function EditMaterialClient({ id, initialData }: { id: string, initialData: MaterialFormData }) {
     const router = useRouter();
@@ -24,12 +26,15 @@ export default function EditMaterialClient({ id, initialData }: { id: string, in
     return (
         <div className="mx-auto max-w-3xl">
             <div className="mb-4">
-                <button
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1 text-muted-foreground"
                     onClick={() => router.back()}
-                    className="text-sm text-[#2566AF] hover:text-[#1e5294] transition-colors"
                 >
-                    ← Retour
-                </button>
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Retour
+                </Button>
             </div>
             <MaterialForm initialData={initialData} onSubmit={handleSubmit} isEditing />
         </div>

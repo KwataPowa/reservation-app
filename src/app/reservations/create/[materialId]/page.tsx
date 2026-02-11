@@ -3,6 +3,9 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import ReservationForm from '@/components/ReservationForm';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import PageHeader from '@/components/shared/PageHeader';
 
 export default async function CreateReservationPage({
     params,
@@ -26,18 +29,19 @@ export default async function CreateReservationPage({
     return (
         <div className="mx-auto max-w-2xl">
             <div className="mb-4">
-                <Link href="/" className="text-sm text-[#2566AF] hover:text-[#1e5294] transition-colors">
-                    ← Retour au matériel
+                <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Retour au matériel
                 </Link>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                <div className="px-6 py-5">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-5">
+            <Card>
+                <CardContent className="p-6">
+                    <h2 className="text-lg font-semibold text-foreground mb-5">
                         Nouvelle Réservation
                     </h2>
                     <ReservationForm materialId={material.id} materialName={material.name} />
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

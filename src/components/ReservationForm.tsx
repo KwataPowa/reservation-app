@@ -2,6 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 export default function ReservationForm({ materialId, materialName }: { materialId: string; materialName: string }) {
     const router = useRouter();
@@ -39,76 +44,67 @@ export default function ReservationForm({ materialId, materialName }: { material
     return (
         <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-                <label className="block text-sm font-medium text-gray-600">Matériel</label>
-                <p className="mt-1 text-base font-semibold text-gray-900">{materialName}</p>
+                <Label className="text-muted-foreground">Matériel</Label>
+                <p className="mt-1 text-base font-semibold text-foreground">{materialName}</p>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-600">
-                        Date de début
-                    </label>
-                    <input
+                <div className="space-y-2">
+                    <Label htmlFor="startDate">Date de début</Label>
+                    <Input
                         type="date"
                         id="startDate"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         required
                         min={new Date().toISOString().split('T')[0]}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
                     />
                 </div>
-                <div>
-                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-600">
-                        Date de fin
-                    </label>
-                    <input
+                <div className="space-y-2">
+                    <Label htmlFor="endDate">Date de fin</Label>
+                    <Input
                         type="date"
                         id="endDate"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         required
                         min={startDate || new Date().toISOString().split('T')[0]}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
                     />
                 </div>
             </div>
 
-            <div>
-                <label htmlFor="purpose" className="block text-sm font-medium text-gray-600">
-                    Motif de la réservation
-                </label>
-                <textarea
+            <div className="space-y-2">
+                <Label htmlFor="purpose">Motif de la réservation</Label>
+                <Textarea
                     id="purpose"
                     value={purpose}
                     onChange={(e) => setPurpose(e.target.value)}
                     rows={3}
                     placeholder="Décrivez l'usage prévu du matériel..."
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2566AF] focus:ring-1 focus:ring-[#2566AF]"
                 />
             </div>
 
             {error && (
-                <div className="rounded-md bg-red-50 border border-red-200 p-3">
-                    <p className="text-sm text-red-700">{error}</p>
+                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                    <p className="text-sm text-destructive">{error}</p>
                 </div>
             )}
 
             <div className="flex justify-end gap-3">
-                <button
+                <Button
                     type="button"
+                    variant="outline"
                     onClick={() => router.back()}
-                    className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                     Annuler
-                </button>
-                <button
+                </Button>
+                <Button
                     type="submit"
                     disabled={loading}
-                    className="rounded-md bg-[#2566AF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1e5294] disabled:opacity-50 transition-colors"
                 >
                     {loading ? 'Réservation...' : 'Réserver'}
-                </button>
+                </Button>
             </div>
         </form>
     );

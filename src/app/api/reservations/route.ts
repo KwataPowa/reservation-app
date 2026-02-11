@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { auth } from '@/auth'
+import { getAdminEmails } from '@/lib/dal'
+import { sendReservationSubmittedEmail } from '@/lib/email'
 
 export async function GET() {
     const session = await auth()
@@ -51,8 +53,11 @@ export async function POST(request: Request) {
             )
         }
 
-
         const status = session.user.role === 'ADMIN' ? 'APPROVED' : 'PENDING';
+
+        const material = await prisma.material.findUnique({
+            where: { id: body.materialId },
+        })
 
         const reservation = await prisma.reservation.create({
             data: {
@@ -65,6 +70,22 @@ export async function POST(request: Request) {
                 status: status,
             },
         })
+
+        // Fire-and-forget: email admins about new reservation
+        if (status === 'PENDING' && material) {
+            getAdminEmails().then((adminEmails) => {
+                sendReservationSubmittedEmail(adminEmails, {
+                    materialName: material.name,
+                    userName: session.user!.name || 'Utilisateur',
+                    userEmail: session.user!.email || '',
+                    startDate: body.startDate,
+                    endDate: body.endDate,
+                    purpose: body.purpose,
+                    location: body.location,
+                });
+            });
+        }
+
         return NextResponse.json(reservation, { status: 201 })
     } catch (error) {
         console.error('Error creating reservation:', error)

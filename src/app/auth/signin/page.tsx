@@ -2,6 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { LogIn, AlertCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 function SignInContent() {
     const searchParams = useSearchParams();
@@ -13,34 +16,42 @@ function SignInContent() {
     };
 
     return (
-        <div className="flex min-h-[70vh] flex-col items-center justify-center">
+        <div className="flex min-h-[70vh] flex-col items-center justify-center px-4">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-[#2566AF]">ICUBE Resa</h1>
-                    <p className="mt-2 text-sm text-gray-500">
-                        Connectez-vous pour réserver du matériel
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-lg mb-4">
+                        IC
+                    </div>
+                    <h1 className="text-2xl font-bold text-foreground">ICUBE Resa</h1>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        Réservation de matériel scientifique
                     </p>
                 </div>
 
                 {error && (
-                    <div className="mb-4 rounded-md bg-red-50 border border-red-200 p-4">
-                        <p className="text-sm text-red-700">
+                    <div className="mb-4 rounded-lg bg-destructive/10 border border-destructive/20 p-4 flex items-start gap-3">
+                        <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                        <p className="text-sm text-destructive">
                             Erreur d&apos;authentification : {error}
                         </p>
                     </div>
                 )}
 
-                <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-                    <button
-                        onClick={handleLogin}
-                        className="flex w-full justify-center rounded-md bg-[#2566AF] py-2.5 px-4 text-sm font-medium text-white hover:bg-[#1e5294] transition-colors"
-                    >
-                        Se connecter avec CAS Unistra
-                    </button>
-                    <p className="mt-4 text-center text-xs text-gray-400">
-                        Vous serez redirigé vers le portail CAS de l&apos;Université de Strasbourg
-                    </p>
-                </div>
+                <Card>
+                    <CardContent className="p-6 space-y-4">
+                        <Button
+                            onClick={handleLogin}
+                            className="w-full gap-2"
+                            size="lg"
+                        >
+                            <LogIn className="h-4 w-4" />
+                            Se connecter avec CAS Unistra
+                        </Button>
+                        <p className="text-center text-xs text-muted-foreground">
+                            Vous serez redirigé vers le portail CAS de l&apos;Université de Strasbourg
+                        </p>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
@@ -48,7 +59,11 @@ function SignInContent() {
 
 export default function SignInPage() {
     return (
-        <Suspense fallback={<div className="text-center py-12 text-gray-400">Chargement...</div>}>
+        <Suspense fallback={
+            <div className="flex min-h-[70vh] items-center justify-center">
+                <p className="text-sm text-muted-foreground">Chargement...</p>
+            </div>
+        }>
             <SignInContent />
         </Suspense>
     );

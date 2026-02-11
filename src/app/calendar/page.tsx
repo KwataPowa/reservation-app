@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import CalendarView from '@/components/CalendarView';
+import PageHeader from '@/components/shared/PageHeader';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,13 +23,10 @@ export default async function CalendarPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Planning</h1>
-                    <p className="mt-1 text-xs text-gray-500 font-mono">VUE D'ENSEMBLE DES RÉSERVATIONS</p>
-                </div>
-            </div>
-
+            <PageHeader
+                title="Planning"
+                subtitle="Vue d'ensemble des réservations"
+            />
             <CalendarView materials={materials} reservations={reservations} />
         </div>
     );
