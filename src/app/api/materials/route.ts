@@ -26,7 +26,10 @@ export async function POST(request: Request) {
                 location: body.location,
                 category: body.category,
                 status: body.status || 'AVAILABLE',
+                budget: body.budget || null,
                 imageUrl: body.imageUrl || null,
+                notes: body.notes || null,
+                components: body.components || [],
             },
         })
         return NextResponse.json(material, { status: 201 })

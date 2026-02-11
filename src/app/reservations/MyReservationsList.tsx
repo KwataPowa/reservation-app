@@ -24,9 +24,16 @@ interface SerializedReservation {
     materialName: string;
 }
 
-export default function MyReservationsList({ reservations }: { reservations: SerializedReservation[] }) {
+export default function MyReservationsList({ reservations: initialReservations }: { reservations: SerializedReservation[] }) {
+    const [reservations, setReservations] = useState(initialReservations);
     const [returnModal, setReturnModal] = useState<{ id: string; materialName: string } | null>(null);
     const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'PAST'>('ALL');
+
+    const updateStatus = (id: string, newStatus: string) => {
+        setReservations(prev => prev.map(r =>
+            r.id === id ? { ...r, status: newStatus } : r
+        ));
+    };
 
     const canReturn = (reservation: SerializedReservation) => {
         if (reservation.status !== 'APPROVED') return false;
@@ -152,6 +159,7 @@ export default function MyReservationsList({ reservations }: { reservations: Ser
                                                 reservationId={reservation.id}
                                                 materialName={reservation.materialName}
                                                 status={reservation.status}
+                                                onSuccess={() => updateStatus(reservation.id, 'CANCELLED')}
                                             />
                                         )}
                                         {canReturn(reservation) && (
@@ -186,6 +194,7 @@ export default function MyReservationsList({ reservations }: { reservations: Ser
                     onClose={() => setReturnModal(null)}
                     reservationId={returnModal.id}
                     materialName={returnModal.materialName}
+                    onSuccess={() => updateStatus(returnModal.id, 'RETURNED')}
                 />
             )}
         </>

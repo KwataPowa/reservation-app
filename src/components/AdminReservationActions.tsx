@@ -166,6 +166,7 @@ export default function AdminReservationActions({ reservation }: { reservation: 
                                     reservationId={reservation.id}
                                     materialName={reservation.material.name}
                                     status={status}
+                                    onSuccess={() => setStatus('CANCELLED')}
                                 />
                             )}
                         </div>
@@ -180,6 +181,7 @@ export default function AdminReservationActions({ reservation }: { reservation: 
                     reservationId={reservation.id}
                     materialName={reservation.material.name}
                     isAdminForce={true}
+                    onSuccess={() => setStatus('RETURNED')}
                 />
             )}
         </>

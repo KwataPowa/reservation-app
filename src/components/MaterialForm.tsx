@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Box, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Box, Image as ImageIcon, AlertCircle, Upload, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,6 +26,7 @@ export interface MaterialFormData {
     status: string;
     budget: string;
     imageUrl: string;
+    notes: string;
     components: { name: string; serialNumber: string }[];
 }
 
@@ -38,6 +39,7 @@ interface MaterialFormProps {
 export default function MaterialForm({ initialData, onSubmit, isEditing = false }: MaterialFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const [form, setForm] = useState<MaterialFormData>(initialData || {
         name: '',
@@ -48,6 +50,7 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
         status: 'AVAILABLE',
         budget: '',
         imageUrl: '',
+        notes: '',
         components: [],
     });
 
@@ -68,6 +71,23 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
         const newComponents = [...form.components];
         newComponents[index][field] = value;
         setForm({ ...form, components: newComponents });
+    };
+
+    const handleFileUpload = async (file: File) => {
+        setUploading(true);
+        setError('');
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Erreur upload');
+            setForm({ ...form, imageUrl: data.url });
+        } catch (err: any) {
+            setError(err.message || 'Erreur lors de l\'upload');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -147,19 +167,96 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="imageUrl">URL Image</Label>
-                                <div className="relative">
-                                    <ImageIcon size={16} className="absolute left-3 top-2.5 text-muted-foreground" />
-                                    <Input
-                                        type="url"
-                                        id="imageUrl"
-                                        value={form.imageUrl}
-                                        onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                                        className="pl-9"
-                                        placeholder="https://..."
-                                    />
-                                </div>
-                                <p className="text-[10px] text-muted-foreground">Lien direct vers une image du matériel.</p>
+                                <Label>Image du matériel</Label>
+
+                                {/* Preview */}
+                                {form.imageUrl && (
+                                    <div className="relative w-full max-w-[200px] aspect-square rounded-lg border overflow-hidden bg-muted">
+                                        <img src={form.imageUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setForm({ ...form, imageUrl: '' })}
+                                            className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
+                                            aria-label="Supprimer l'image"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Upload zone */}
+                                {!form.imageUrl && (
+                                    <label
+                                        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                                            uploading ? 'border-primary/50 bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50'
+                                        }`}
+                                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            const file = e.dataTransfer.files[0];
+                                            if (file && file.type.startsWith('image/')) handleFileUpload(file);
+                                        }}
+                                    >
+                                        <input
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp,image/gif"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) handleFileUpload(file);
+                                            }}
+                                            disabled={uploading}
+                                        />
+                                        {uploading ? (
+                                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                                <Loader2 size={24} className="animate-spin text-primary" />
+                                                <span className="text-xs">Upload en cours...</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                                <Upload size={24} />
+                                                <span className="text-xs">Glisser une image ou cliquer pour parcourir</span>
+                                                <span className="text-[10px]">JPG, PNG, WebP, GIF (max 5 Mo)</span>
+                                            </div>
+                                        )}
+                                    </label>
+                                )}
+
+                                {/* Fallback: manual URL */}
+                                {!form.imageUrl && !uploading && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-px flex-1 bg-border" />
+                                        <span className="text-[10px] text-muted-foreground">ou coller un lien</span>
+                                        <div className="h-px flex-1 bg-border" />
+                                    </div>
+                                )}
+                                {!form.imageUrl && !uploading && (
+                                    <div className="relative">
+                                        <ImageIcon size={16} className="absolute left-3 top-2.5 text-muted-foreground" />
+                                        <Input
+                                            type="url"
+                                            value={form.imageUrl}
+                                            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                                            className="pl-9"
+                                            placeholder="https://..."
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="notes" className="flex items-center gap-1.5">
+                                    Notes / Problèmes connus
+                                </Label>
+                                <Textarea
+                                    id="notes"
+                                    value={form.notes}
+                                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                                    rows={2}
+                                    placeholder="Ex: Câble USB-C à remplacer, pile du tracker faible..."
+                                />
+                                <p className="text-[10px] text-muted-foreground">Signaler les problèmes connus ou notes de maintenance.</p>
                             </div>
                         </div>
 
@@ -177,17 +274,20 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Catégorie</Label>
-                                    <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {MATERIAL_CATEGORIES.map((cat) => (
-                                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Label htmlFor="category">Catégorie</Label>
+                                    <Input
+                                        type="text"
+                                        id="category"
+                                        list="category-suggestions"
+                                        value={form.category}
+                                        onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                        placeholder="Saisir ou choisir..."
+                                    />
+                                    <datalist id="category-suggestions">
+                                        {MATERIAL_CATEGORIES.map((cat) => (
+                                            <option key={cat} value={cat} />
+                                        ))}
+                                    </datalist>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Statut Initial</Label>

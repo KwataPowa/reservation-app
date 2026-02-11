@@ -32,6 +32,7 @@ export default async function EditMaterialPage({ params }: { params: Promise<{ i
         serialNumber: material.serialNumber || '',
         budget: material.budget || '',
         imageUrl: material.imageUrl || '',
+        notes: material.notes || '',
         status: material.status,
         components: components,
     };

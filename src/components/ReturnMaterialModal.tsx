@@ -16,6 +16,7 @@ interface ReturnMaterialModalProps {
     reservationId: string;
     materialName: string;
     isAdminForce?: boolean;
+    onSuccess?: () => void;
 }
 
 export default function ReturnMaterialModal({
@@ -24,6 +25,7 @@ export default function ReturnMaterialModal({
     reservationId,
     materialName,
     isAdminForce = false,
+    onSuccess,
 }: ReturnMaterialModalProps) {
     const router = useRouter();
     const [hasIssue, setHasIssue] = useState(false);
@@ -56,6 +58,7 @@ export default function ReturnMaterialModal({
             }
 
             toast.success('Matériel rendu avec succès !');
+            onSuccess?.();
             handleClose();
             router.refresh();
         } catch (err: any) {

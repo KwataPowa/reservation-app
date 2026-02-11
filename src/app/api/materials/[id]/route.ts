@@ -46,7 +46,8 @@ export async function PATCH(
                 status: body.status,
                 budget: body.budget || null,
                 imageUrl: body.imageUrl || null,
-                components: body.components || [], // Assumes JSON array
+                notes: body.notes || null,
+                components: body.components || [],
             },
         })
         return NextResponse.json(material)

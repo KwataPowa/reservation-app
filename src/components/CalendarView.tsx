@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
+    SelectSeparator,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -27,6 +30,7 @@ const DAYS_HEADER = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 export default function CalendarView({ materials, reservations }: CalendarProps) {
     const [viewDate, setViewDate] = useState(new Date());
+    const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
     const [selectedMaterialId, setSelectedMaterialId] = useState<string>('ALL');
 
     const year = viewDate.getFullYear();
@@ -42,8 +46,30 @@ export default function CalendarView({ materials, reservations }: CalendarProps)
         return result;
     }, [year, month, daysInMonth, startOffset]);
 
+    // Group materials by category
+    const categories = useMemo(() => {
+        const catMap = new Map<string, Material[]>();
+        materials.forEach(m => {
+            const cat = m.category || 'Autres';
+            if (!catMap.has(cat)) catMap.set(cat, []);
+            catMap.get(cat)!.push(m);
+        });
+        return Array.from(catMap.entries()).sort(([a], [b]) => a.localeCompare(b));
+    }, [materials]);
+
+    // Filtered materials based on selected category
+    const filteredMaterials = useMemo(() => {
+        if (selectedCategory === 'ALL') return materials;
+        return materials.filter(m => (m.category || 'Autres') === selectedCategory);
+    }, [materials, selectedCategory]);
+
     const today = new Date();
     const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+    const handleCategoryChange = (value: string) => {
+        setSelectedCategory(value);
+        setSelectedMaterialId('ALL'); // Reset equipment when category changes
+    };
 
     const getReservationsForDate = (date: Date) => {
         return reservations.filter(res => {
@@ -51,6 +77,9 @@ export default function CalendarView({ materials, reservations }: CalendarProps)
             const rStart = new Date(res.startDate).setHours(0, 0, 0, 0);
             const rEnd = new Date(res.endDate).setHours(23, 59, 59, 999);
             if (checkDate < rStart || checkDate > rEnd) return false;
+            // Filter by category
+            if (selectedCategory !== 'ALL' && (res.material.category || 'Autres') !== selectedCategory) return false;
+            // Filter by specific equipment
             if (selectedMaterialId !== 'ALL' && res.materialId !== selectedMaterialId) return false;
             return true;
         });
@@ -100,17 +129,50 @@ export default function CalendarView({ materials, reservations }: CalendarProps)
                     )}
                 </div>
 
-                <Select value={selectedMaterialId} onValueChange={setSelectedMaterialId}>
-                    <SelectTrigger className="w-full sm:w-[220px]" size="sm">
-                        <SelectValue placeholder="Filtrer par équipement" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="ALL">Tous les équipements</SelectItem>
-                        {materials.map(m => (
-                            <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    {/* Category filter */}
+                    <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                        <SelectTrigger className="w-full sm:w-[180px]" size="sm">
+                            <SelectValue placeholder="Catégorie" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="ALL">Toutes catégories</SelectItem>
+                            <SelectSeparator />
+                            {categories.map(([cat]) => (
+                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* Equipment filter */}
+                    <Select value={selectedMaterialId} onValueChange={setSelectedMaterialId}>
+                        <SelectTrigger className="w-full sm:w-[220px]" size="sm">
+                            <SelectValue placeholder="Équipement" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="ALL">
+                                {selectedCategory === 'ALL' ? 'Tous les équipements' : `Tous (${selectedCategory})`}
+                            </SelectItem>
+                            <SelectSeparator />
+                            {selectedCategory === 'ALL' ? (
+                                // Grouped by category
+                                categories.map(([cat, mats]) => (
+                                    <SelectGroup key={cat}>
+                                        <SelectLabel>{cat}</SelectLabel>
+                                        {mats.map(m => (
+                                            <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                ))
+                            ) : (
+                                // Flat list for selected category
+                                filteredMaterials.map(m => (
+                                    <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                                ))
+                            )}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             {/* Grid */}

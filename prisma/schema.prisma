@@ -31,6 +31,7 @@ model Material {
   budget        String?   // Ex: "IdEx Flavien 2022"
   imageUrl      String?   // URL to image
   components    Json?     // List of sub-items [{ name, serialNumber }]
+  notes         String?   // Known issues, maintenance notes
   status        Status    @default(AVAILABLE)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

@@ -22,6 +22,7 @@ interface CancelReservationDialogProps {
   materialName: string;
   status: string;
   trigger?: React.ReactNode;
+  onSuccess?: () => void;
 }
 
 export default function CancelReservationDialog({
@@ -29,6 +30,7 @@ export default function CancelReservationDialog({
   materialName,
   status,
   trigger,
+  onSuccess,
 }: CancelReservationDialogProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -46,6 +48,7 @@ export default function CancelReservationDialog({
       }
 
       toast.success('Réservation annulée');
+      onSuccess?.();
       router.refresh();
     } catch (err: any) {
       toast.error('Erreur', { description: err.message });
