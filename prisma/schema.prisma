@@ -38,18 +38,21 @@ model Material {
 }
 
 model Reservation {
-  id          String    @id @default(cuid())
-  startDate   DateTime
-  endDate     DateTime
-  purpose     String?
-  location    String?
-  status      ReservationStatus @default(PENDING)
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  materialId  String
-  material    Material  @relation(fields: [materialId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  startDate      DateTime
+  endDate        DateTime
+  purpose        String?
+  location       String?
+  status         ReservationStatus @default(PENDING)
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  materialId     String
+  material       Material  @relation(fields: [materialId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  returnedAt     DateTime?
+  returnNote     String?
+  returnHasIssue Boolean   @default(false)
 }
 
 enum Role {
@@ -68,4 +71,5 @@ enum ReservationStatus {
   APPROVED
   REJECTED
   CANCELLED
+  RETURNED
 }

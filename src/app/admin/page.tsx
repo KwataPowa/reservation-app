@@ -70,6 +70,7 @@ export default async function AdminPage() {
                                     <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Détails</th>
                                     <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Demandeur</th>
                                     <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Date/Statut</th>
+                                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Motif</th>
                                     <th className="px-4 py-3 text-right text-[10px] font-bold text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -82,6 +83,7 @@ export default async function AdminPage() {
                                             startDate: reservation.startDate.toISOString(),
                                             endDate: reservation.endDate.toISOString(),
                                             createdAt: reservation.createdAt.toISOString(),
+                                            returnedAt: reservation.returnedAt?.toISOString() || null,
                                             user: { name: reservation.user.name, email: reservation.user.email },
                                             material: { name: reservation.material.name, category: reservation.material.category },
                                         }}
