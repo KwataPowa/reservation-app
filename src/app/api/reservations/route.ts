@@ -72,7 +72,7 @@ export async function POST(request: Request) {
         })
 
         // Fire-and-forget: email admins about new reservation
-        if (status === 'PENDING' && material) {
+        if (material) {
             getAdminEmails().then((adminEmails) => {
                 sendReservationSubmittedEmail(adminEmails, {
                     materialName: material.name,
