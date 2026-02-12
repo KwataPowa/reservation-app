@@ -1,18 +1,21 @@
 import nodemailer from 'nodemailer';
 
-// Configuration du transporteur SMTP pour l'Unistra
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'partage.unistra.fr',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false // Necessary for some internal networks, verify if needed
-  }
-});
+// Crée un nouveau transporteur à chaque appel pour éviter
+// les problèmes de connexion persistante en environnement serverless (Vercel)
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'partage.unistra.fr',
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+}
 
 function getFrom() {
   return process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@unistra.fr';
@@ -104,7 +107,7 @@ export async function sendReservationSubmittedEmail(adminEmails: string[], data:
   }
 
   try {
-    const info = await transporter.sendMail({
+    const info = await createTransporter().sendMail({
       from: getFrom(),
       to: adminEmails, // Nodemailer accepts array of strings
       subject: `Nouvelle demande de réservation - ${data.materialName}`,
@@ -126,7 +129,7 @@ export async function sendReservationApprovedEmail(userEmail: string, data: Rese
   if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) return;
 
   try {
-    const info = await transporter.sendMail({
+    const info = await createTransporter().sendMail({
       from: getFrom(),
       to: userEmail,
       subject: `Réservation approuvée - ${data.materialName}`,
@@ -148,7 +151,7 @@ export async function sendReservationRejectedEmail(userEmail: string, data: Rese
   if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) return;
 
   try {
-    const info = await transporter.sendMail({
+    const info = await createTransporter().sendMail({
       from: getFrom(),
       to: userEmail,
       subject: `Réservation refusée - ${data.materialName}`,
@@ -171,7 +174,7 @@ export async function sendReservationCancelledEmail(adminEmails: string[], data:
   if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) return;
 
   try {
-    const info = await transporter.sendMail({
+    const info = await createTransporter().sendMail({
       from: getFrom(),
       to: adminEmails,
       subject: `Réservation annulée - ${data.materialName}`,
