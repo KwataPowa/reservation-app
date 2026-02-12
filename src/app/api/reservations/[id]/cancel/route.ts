@@ -47,17 +47,16 @@ export async function POST(
       include: { material: true, user: true },
     });
 
-    // Fire-and-forget: email admins about cancellation
-    getAdminEmails().then((adminEmails) => {
-      sendReservationCancelledEmail(adminEmails, {
-        materialName: updatedReservation.material.name,
-        userName: updatedReservation.user.name || 'Utilisateur',
-        userEmail: updatedReservation.user.email,
-        startDate: updatedReservation.startDate.toISOString(),
-        endDate: updatedReservation.endDate.toISOString(),
-        purpose: updatedReservation.purpose,
-        location: updatedReservation.location,
-      });
+    // Await email sending — required for Vercel serverless
+    const adminEmails = await getAdminEmails();
+    await sendReservationCancelledEmail(adminEmails, {
+      materialName: updatedReservation.material.name,
+      userName: updatedReservation.user.name || 'Utilisateur',
+      userEmail: updatedReservation.user.email,
+      startDate: updatedReservation.startDate.toISOString(),
+      endDate: updatedReservation.endDate.toISOString(),
+      purpose: updatedReservation.purpose,
+      location: updatedReservation.location,
     });
 
     return NextResponse.json(updatedReservation);

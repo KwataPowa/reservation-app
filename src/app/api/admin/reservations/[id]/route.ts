@@ -29,7 +29,7 @@ export async function PATCH(
             include: { user: true, material: true },
         })
 
-        // Fire-and-forget: email user about status change
+        // Await email sending — required for Vercel serverless
         const emailData = {
             materialName: reservation.material.name,
             userName: reservation.user.name || 'Utilisateur',
@@ -41,9 +41,9 @@ export async function PATCH(
         };
 
         if (status === 'APPROVED') {
-            sendReservationApprovedEmail(reservation.user.email, emailData);
+            await sendReservationApprovedEmail(reservation.user.email, emailData);
         } else if (status === 'REJECTED') {
-            sendReservationRejectedEmail(reservation.user.email, emailData);
+            await sendReservationRejectedEmail(reservation.user.email, emailData);
         }
 
         return NextResponse.json(reservation)

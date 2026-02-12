@@ -71,18 +71,17 @@ export async function POST(request: Request) {
             },
         })
 
-        // Fire-and-forget: email admins about new reservation
+        // Await email sending — required for Vercel serverless
         if (material) {
-            getAdminEmails().then((adminEmails) => {
-                sendReservationSubmittedEmail(adminEmails, {
-                    materialName: material.name,
-                    userName: session.user!.name || 'Utilisateur',
-                    userEmail: session.user!.email || '',
-                    startDate: body.startDate,
-                    endDate: body.endDate,
-                    purpose: body.purpose,
-                    location: body.location,
-                });
+            const adminEmails = await getAdminEmails();
+            await sendReservationSubmittedEmail(adminEmails, {
+                materialName: material.name,
+                userName: session.user!.name || 'Utilisateur',
+                userEmail: session.user!.email || '',
+                startDate: body.startDate,
+                endDate: body.endDate,
+                purpose: body.purpose,
+                location: body.location,
             });
         }
 
