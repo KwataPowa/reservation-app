@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { CalendarDays, PackageCheck, AlertTriangle, Package } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -95,86 +94,66 @@ export default function MyReservationsList({ reservations: initialReservations }
                 ))}
             </div>
 
-            {/* Reservation cards */}
-            <div className="space-y-3">
+            {/* Reservation rows */}
+            <div className="space-y-1.5">
                 {filtered.map((reservation) => {
                     const config = reservationStatusConfig[reservation.status as ReservationStatus];
                     const StatusIcon = config?.icon;
 
                     return (
-                        <Card key={reservation.id} className="overflow-hidden">
-                            <CardContent className="p-4">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                    <div className="flex-1 min-w-0 space-y-1.5">
-                                        <div className="flex items-center gap-2">
-                                            <p className="text-sm font-semibold text-foreground">
-                                                {reservation.materialName}
-                                            </p>
-                                            {config && (
-                                                <Badge variant="outline" className={cn('text-[11px] gap-1', config.className)}>
-                                                    {StatusIcon && <StatusIcon className="h-3 w-3" />}
-                                                    {config.label}
-                                                </Badge>
-                                            )}
-                                        </div>
+                        <div key={reservation.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border bg-card hover:bg-accent/30 transition-colors">
+                            {/* Status badge */}
+                            {config && (
+                                <Badge variant="outline" className={cn('text-[11px] gap-1 shrink-0 whitespace-nowrap', config.className)}>
+                                    {StatusIcon && <StatusIcon className="h-3 w-3" />}
+                                    {config.label}
+                                </Badge>
+                            )}
 
-                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                                            <span className="inline-flex items-center gap-1.5">
-                                                <CalendarDays className="h-3 w-3" />
-                                                {formatDate(reservation.startDate)} — {formatDate(reservation.endDate)}
-                                            </span>
-                                            {reservation.purpose && (
-                                                <span className="truncate max-w-[250px]">{reservation.purpose}</span>
-                                            )}
-                                        </div>
+                            {/* Material name */}
+                            <span className="text-sm font-semibold text-foreground truncate shrink-0">
+                                {reservation.materialName}
+                            </span>
 
-                                        {/* Return info */}
-                                        {reservation.status === 'RETURNED' && (
-                                            <div className="flex flex-wrap items-center gap-2 text-xs">
-                                                {reservation.returnedAt && (
-                                                    <span className="text-blue-600">
-                                                        Rendu le {formatDate(reservation.returnedAt)}
-                                                    </span>
-                                                )}
-                                                {reservation.returnHasIssue && (
-                                                    <span className="inline-flex items-center gap-1 text-destructive font-medium">
-                                                        <AlertTriangle className="h-3 w-3" />
-                                                        Problème signalé
-                                                    </span>
-                                                )}
-                                                {reservation.returnNote && (
-                                                    <span className="text-muted-foreground italic truncate max-w-[300px]" title={reservation.returnNote}>
-                                                        — {reservation.returnNote}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
+                            {/* Dates */}
+                            <span className="text-xs text-muted-foreground lab-mono shrink-0 hidden sm:inline-flex items-center gap-1.5">
+                                <CalendarDays className="h-3 w-3" />
+                                {formatDate(reservation.startDate)} — {formatDate(reservation.endDate)}
+                            </span>
 
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-2 shrink-0">
-                                        {canCancel(reservation) && (
-                                            <CancelReservationDialog
-                                                reservationId={reservation.id}
-                                                materialName={reservation.materialName}
-                                                status={reservation.status}
-                                                onSuccess={() => updateStatus(reservation.id, 'CANCELLED')}
-                                            />
-                                        )}
-                                        {canReturn(reservation) && (
-                                            <Button
-                                                size="sm"
-                                                className="gap-1.5"
-                                                onClick={() => setReturnModal({ id: reservation.id, materialName: reservation.materialName })}
-                                            >
-                                                <PackageCheck className="h-3.5 w-3.5" />
-                                                Rendre
-                                            </Button>
-                                        )}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                            {/* Return info */}
+                            {reservation.status === 'RETURNED' && reservation.returnHasIssue && (
+                                <span className="inline-flex items-center gap-1 text-xs text-destructive font-medium shrink-0">
+                                    <AlertTriangle className="h-3 w-3" />
+                                    Problème
+                                </span>
+                            )}
+
+                            {/* Spacer */}
+                            <div className="flex-1" />
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                {canCancel(reservation) && (
+                                    <CancelReservationDialog
+                                        reservationId={reservation.id}
+                                        materialName={reservation.materialName}
+                                        status={reservation.status}
+                                        onSuccess={() => updateStatus(reservation.id, 'CANCELLED')}
+                                    />
+                                )}
+                                {canReturn(reservation) && (
+                                    <Button
+                                        size="sm"
+                                        className="h-7 gap-1 text-xs px-2"
+                                        onClick={() => setReturnModal({ id: reservation.id, materialName: reservation.materialName })}
+                                    >
+                                        <PackageCheck className="h-3.5 w-3.5" />
+                                        Rendre
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
                     );
                 })}
 
