@@ -1,11 +1,10 @@
 import prisma from '@/lib/prisma';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import AdminReservationActions from '@/components/AdminReservationActions';
+import AdminReservationList from './AdminReservationList';
 import PageHeader from '@/components/shared/PageHeader';
-import EmptyState from '@/components/shared/EmptyState';
 import Link from 'next/link';
-import { Plus, Package, Clock, CheckCircle, FileText } from 'lucide-react';
+import { Plus, Package, Clock, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -79,37 +78,15 @@ export default async function AdminPage() {
             </div>
 
             {/* Reservations list */}
-            <div>
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-sm font-semibold text-foreground">Réservations</h2>
-                    <span className="text-xs text-muted-foreground lab-mono">{reservations.length} total</span>
-                </div>
-
-                {reservations.length === 0 ? (
-                    <EmptyState
-                        icon={<FileText className="h-5 w-5" />}
-                        title="Aucune réservation"
-                        description="Les demandes de réservation apparaîtront ici."
-                    />
-                ) : (
-                    <div className="space-y-3">
-                        {reservations.map((reservation) => (
-                            <AdminReservationActions
-                                key={reservation.id}
-                                reservation={{
-                                    ...reservation,
-                                    startDate: reservation.startDate.toISOString(),
-                                    endDate: reservation.endDate.toISOString(),
-                                    createdAt: reservation.createdAt.toISOString(),
-                                    returnedAt: reservation.returnedAt?.toISOString() || null,
-                                    user: { name: reservation.user.name, email: reservation.user.email },
-                                    material: { name: reservation.material.name, category: reservation.material.category },
-                                }}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+            <AdminReservationList reservations={reservations.map((reservation) => ({
+                ...reservation,
+                startDate: reservation.startDate.toISOString(),
+                endDate: reservation.endDate.toISOString(),
+                createdAt: reservation.createdAt.toISOString(),
+                returnedAt: reservation.returnedAt?.toISOString() || null,
+                user: { name: reservation.user.name, email: reservation.user.email },
+                material: { name: reservation.material.name, category: reservation.material.category },
+            }))} />
         </div>
     );
 }

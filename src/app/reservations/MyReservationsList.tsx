@@ -27,7 +27,7 @@ interface SerializedReservation {
 export default function MyReservationsList({ reservations: initialReservations }: { reservations: SerializedReservation[] }) {
     const [reservations, setReservations] = useState(initialReservations);
     const [returnModal, setReturnModal] = useState<{ id: string; materialName: string } | null>(null);
-    const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'PAST'>('ALL');
+    const [filter, setFilter] = useState<'ACTIVE' | 'PAST'>('ACTIVE');
 
     const updateStatus = (id: string, newStatus: string) => {
         setReservations(prev => prev.map(r =>
@@ -51,7 +51,6 @@ export default function MyReservationsList({ reservations: initialReservations }
     });
 
     const filters = [
-        { key: 'ALL' as const, label: 'Toutes', count: reservations.length },
         { key: 'ACTIVE' as const, label: 'En cours', count: reservations.filter(r => ['PENDING', 'APPROVED'].includes(r.status)).length },
         { key: 'PAST' as const, label: 'Terminées', count: reservations.filter(r => ['REJECTED', 'CANCELLED', 'RETURNED'].includes(r.status)).length },
     ];
