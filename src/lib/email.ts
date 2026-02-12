@@ -1,11 +1,21 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY || '');
-}
+// Configuration du transporteur SMTP pour l'Unistra
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'partage.unistra.fr',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false // Necessary for some internal networks, verify if needed
+  }
+});
 
 function getFrom() {
-  return process.env.EMAIL_FROM || 'ICUBE Resa <noreply@resend.dev>';
+  return process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@unistra.fr';
 }
 
 function getAppUrl() {
@@ -88,12 +98,15 @@ function reservationDetails(data: ReservationEmailData) {
 }
 
 export async function sendReservationSubmittedEmail(adminEmails: string[], data: ReservationEmailData) {
-  if (!process.env.RESEND_API_KEY || adminEmails.length === 0) return;
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+    console.warn('SMTP credentials missing, email not sent');
+    return;
+  }
 
   try {
-    await getResend().emails.send({
+    const info = await transporter.sendMail({
       from: getFrom(),
-      to: adminEmails,
+      to: adminEmails, // Nodemailer accepts array of strings
       subject: `Nouvelle demande de réservation - ${data.materialName}`,
       html: baseHtml(
         'Nouvelle demande de réservation',
@@ -103,18 +116,19 @@ export async function sendReservationSubmittedEmail(adminEmails: string[], data:
         ${reservationDetails(data)}`
       ),
     });
+    console.log('Reservation submitted email sent:', info.messageId);
   } catch (error) {
     console.error('Failed to send reservation submitted email:', error);
   }
 }
 
 export async function sendReservationApprovedEmail(userEmail: string, data: ReservationEmailData) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) return;
 
   try {
-    await getResend().emails.send({
+    const info = await transporter.sendMail({
       from: getFrom(),
-      to: [userEmail],
+      to: userEmail,
       subject: `Réservation approuvée - ${data.materialName}`,
       html: baseHtml(
         'Votre réservation a été approuvée ✓',
@@ -124,18 +138,19 @@ export async function sendReservationApprovedEmail(userEmail: string, data: Rese
         ${reservationDetails(data)}`
       ),
     });
+    console.log('Reservation approved email sent:', info.messageId);
   } catch (error) {
     console.error('Failed to send reservation approved email:', error);
   }
 }
 
 export async function sendReservationRejectedEmail(userEmail: string, data: ReservationEmailData) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) return;
 
   try {
-    await getResend().emails.send({
+    const info = await transporter.sendMail({
       from: getFrom(),
-      to: [userEmail],
+      to: userEmail,
       subject: `Réservation refusée - ${data.materialName}`,
       html: baseHtml(
         'Votre réservation a été refusée',
@@ -146,16 +161,17 @@ export async function sendReservationRejectedEmail(userEmail: string, data: Rese
         ${reservationDetails(data)}`
       ),
     });
+    console.log('Reservation rejected email sent:', info.messageId);
   } catch (error) {
     console.error('Failed to send reservation rejected email:', error);
   }
 }
 
 export async function sendReservationCancelledEmail(adminEmails: string[], data: ReservationEmailData) {
-  if (!process.env.RESEND_API_KEY || adminEmails.length === 0) return;
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) return;
 
   try {
-    await getResend().emails.send({
+    const info = await transporter.sendMail({
       from: getFrom(),
       to: adminEmails,
       subject: `Réservation annulée - ${data.materialName}`,
@@ -167,6 +183,7 @@ export async function sendReservationCancelledEmail(adminEmails: string[], data:
         ${reservationDetails(data)}`
       ),
     });
+    console.log('Reservation cancelled email sent:', info.messageId);
   } catch (error) {
     console.error('Failed to send reservation cancelled email:', error);
   }
