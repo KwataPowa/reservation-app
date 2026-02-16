@@ -42,50 +42,44 @@ export default async function AdminPage() {
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/20">
-                    <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                                        <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                    </div>
-                                    <p className="text-sm font-medium text-blue-900/70 dark:text-blue-100/70">Total équipements</p>
-                                </div>
-                                <p className="text-3xl font-bold lab-mono text-blue-900 dark:text-blue-50">{materialCount}</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <Card>
+                    <CardContent className="p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded bg-muted flex items-center justify-center shrink-0">
+                                <Package className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground">Total équipements</p>
+                                <p className="text-xl font-bold lab-mono">{materialCount}</p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/50 dark:to-amber-900/20">
-                    <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <div className="h-9 w-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                                        <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                                    </div>
-                                    <p className="text-sm font-medium text-amber-900/70 dark:text-amber-100/70">En attente</p>
-                                </div>
-                                <p className="text-3xl font-bold lab-mono text-amber-900 dark:text-amber-50">{pendingCount}</p>
+                <Card>
+                    <CardContent className="p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded bg-amber-100 flex items-center justify-center shrink-0">
+                                <Clock className="h-4 w-4 text-amber-600" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground">En attente</p>
+                                <p className="text-xl font-bold lab-mono text-amber-600">{pendingCount}</p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border-none shadow-sm bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/50 dark:to-emerald-900/20">
-                    <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                        <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                    </div>
-                                    <p className="text-sm font-medium text-emerald-900/70 dark:text-emerald-100/70">Actives</p>
-                                </div>
-                                <p className="text-3xl font-bold lab-mono text-emerald-900 dark:text-emerald-50">{approvedCount}</p>
+                <Card>
+                    <CardContent className="p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded bg-emerald-100 flex items-center justify-center shrink-0">
+                                <CheckCircle className="h-4 w-4 text-emerald-600" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground">Actives</p>
+                                <p className="text-xl font-bold lab-mono text-emerald-600">{approvedCount}</p>
                             </div>
                         </div>
                     </CardContent>
