@@ -101,117 +101,77 @@ export default function MyReservationsList({ reservations: initialReservations }
             </div>
 
             {/* Reservation cards */}
-            <div className="space-y-4">
+            <div className="space-y-2">
                 {filtered.map((reservation) => {
                     const config = reservationStatusConfig[reservation.status as ReservationStatus];
                     const StatusIcon = config?.icon;
 
                     return (
-                        <Card key={reservation.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                            <CardContent className="p-0">
-                                <div className="flex flex-col sm:flex-row gap-0">
-                                    {/* Material image */}
-                                    <div className="sm:w-48 h-40 sm:h-auto bg-muted flex items-center justify-center shrink-0">
-                                        {reservation.material.imageUrl ? (
-                                            <img
-                                                src={reservation.material.imageUrl}
-                                                alt={reservation.material.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <Box className="h-12 w-12 text-muted-foreground/40" />
+                        <Card key={reservation.id} className="overflow-hidden hover:bg-accent/50 transition-colors">
+                            <CardContent className="p-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                    <div className="flex-1 min-w-0 space-y-1.5">
+                                        {/* Material name and status */}
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="font-semibold text-sm text-foreground">
+                                                {reservation.material.name}
+                                            </span>
+                                            {config && (
+                                                <Badge variant="outline" className={cn('text-[11px] gap-1 shrink-0', config.className)}>
+                                                    {StatusIcon && <StatusIcon className="h-3 w-3" />}
+                                                    {config.label}
+                                                </Badge>
+                                            )}
+                                            {reservation.returnHasIssue && (
+                                                <Badge variant="destructive" className="text-[11px] gap-1 shrink-0">
+                                                    <AlertTriangle className="h-3 w-3" />
+                                                    Problème
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        {/* Reservation period and location */}
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                            <span className="inline-flex items-center gap-1">
+                                                <CalendarDays className="h-3 w-3" />
+                                                {formatDate(reservation.startDate)} — {formatDate(reservation.endDate)}
+                                            </span>
+                                            {reservation.material.location && (
+                                                <span className="inline-flex items-center gap-1">
+                                                    <MapPin className="h-3 w-3" />
+                                                    {reservation.material.location}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Return date if returned */}
+                                        {reservation.status === 'RETURNED' && reservation.returnedAt && (
+                                            <div className="text-xs text-blue-600">
+                                                Rendu le {formatDate(reservation.returnedAt)}
+                                            </div>
                                         )}
                                     </div>
 
-                                    {/* Content */}
-                                    <div className="flex-1 p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                                        <div className="flex-1 min-w-0 space-y-3">
-                                            {/* Title and status */}
-                                            <div className="flex items-start gap-2 flex-wrap">
-                                                <h3 className="text-base font-semibold text-foreground">
-                                                    {reservation.material.name}
-                                                </h3>
-                                                {config && (
-                                                    <Badge variant="outline" className={cn('text-xs gap-1.5 shrink-0', config.className)}>
-                                                        {StatusIcon && <StatusIcon className="h-3.5 w-3.5" />}
-                                                        {config.label}
-                                                    </Badge>
-                                                )}
-                                            </div>
-
-                                            {/* Material info */}
-                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-                                                {reservation.material.category && (
-                                                    <span className="inline-flex items-center gap-1.5">
-                                                        <Tag className="h-3.5 w-3.5" />
-                                                        <span>{reservation.material.category}</span>
-                                                    </span>
-                                                )}
-                                                {reservation.material.location && (
-                                                    <span className="inline-flex items-center gap-1.5">
-                                                        <MapPin className="h-3.5 w-3.5" />
-                                                        <span>{reservation.material.location}</span>
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            {/* Dates and purpose */}
-                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
-                                                <span className="inline-flex items-center gap-1.5 text-foreground font-medium">
-                                                    <CalendarDays className="h-4 w-4" />
-                                                    {formatDate(reservation.startDate)} — {formatDate(reservation.endDate)}
-                                                </span>
-                                                {reservation.purpose && (
-                                                    <span className="text-muted-foreground italic line-clamp-1">
-                                                        {reservation.purpose}
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            {/* Return info */}
-                                            {reservation.status === 'RETURNED' && (
-                                                <div className="flex flex-wrap items-center gap-3 text-xs pt-2 border-t">
-                                                    {reservation.returnedAt && (
-                                                        <span className="text-blue-600 font-medium">
-                                                            Rendu le {formatDate(reservation.returnedAt)}
-                                                        </span>
-                                                    )}
-                                                    {reservation.returnHasIssue && (
-                                                        <span className="inline-flex items-center gap-1.5 text-destructive font-medium">
-                                                            <AlertTriangle className="h-3.5 w-3.5" />
-                                                            Problème signalé
-                                                        </span>
-                                                    )}
-                                                    {reservation.returnNote && (
-                                                        <span className="text-muted-foreground italic line-clamp-1 flex-1">
-                                                            {reservation.returnNote}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            {canCancel(reservation) && (
-                                                <CancelReservationDialog
-                                                    reservationId={reservation.id}
-                                                    materialName={reservation.material.name}
-                                                    status={reservation.status}
-                                                    onSuccess={() => updateStatus(reservation.id, 'CANCELLED')}
-                                                />
-                                            )}
-                                            {canReturn(reservation) && (
-                                                <Button
-                                                    size="sm"
-                                                    className="gap-1.5"
-                                                    onClick={() => setReturnModal({ id: reservation.id, material: { name: reservation.material.name } })}
-                                                >
-                                                    <PackageCheck className="h-3.5 w-3.5" />
-                                                    Rendre
-                                                </Button>
-                                            )}
-                                        </div>
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                        {canCancel(reservation) && (
+                                            <CancelReservationDialog
+                                                reservationId={reservation.id}
+                                                materialName={reservation.material.name}
+                                                status={reservation.status}
+                                                onSuccess={() => updateStatus(reservation.id, 'CANCELLED')}
+                                            />
+                                        )}
+                                        {canReturn(reservation) && (
+                                            <Button
+                                                size="sm"
+                                                className="h-7 gap-1 text-xs px-2"
+                                                onClick={() => setReturnModal({ id: reservation.id, material: { name: reservation.material.name } })}
+                                            >
+                                                <PackageCheck className="h-3.5 w-3.5" />
+                                                Rendre
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             </CardContent>

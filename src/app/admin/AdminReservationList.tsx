@@ -79,7 +79,7 @@ export default function AdminReservationList({ reservations }: { reservations: R
                     description="Changez de filtre pour voir d'autres réservations."
                 />
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                     {filtered.map((reservation) => (
                         <AdminReservationActions
                             key={reservation.id}

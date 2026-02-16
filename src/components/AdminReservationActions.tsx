@@ -67,157 +67,114 @@ export default function AdminReservationActions({ reservation }: { reservation: 
 
     return (
         <>
-            <Card className="overflow-hidden hover:shadow-md transition-shadow">
-                <CardContent className="p-0">
-                    <div className="flex flex-col sm:flex-row gap-0">
-                        {/* Material image */}
-                        <div className="sm:w-48 h-40 sm:h-auto bg-muted flex items-center justify-center shrink-0">
-                            {reservation.material.imageUrl ? (
-                                <img
-                                    src={reservation.material.imageUrl}
-                                    alt={reservation.material.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <Box className="h-12 w-12 text-muted-foreground/40" />
+            <Card className="overflow-hidden hover:bg-accent/50 transition-colors">
+                <CardContent className="p-3">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0 space-y-1.5">
+                            {/* Material name, status, and problem badge */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold text-sm text-foreground">
+                                    {reservation.material.name}
+                                </span>
+                                {config && (
+                                    <Badge variant="outline" className={cn('text-[11px] gap-1 shrink-0', config.className)}>
+                                        {StatusIcon && <StatusIcon className="h-3 w-3" />}
+                                        {config.label}
+                                    </Badge>
+                                )}
+                                {reservation.returnHasIssue && (
+                                    <Badge variant="destructive" className="text-[11px] gap-1 shrink-0">
+                                        <AlertTriangle className="h-3 w-3" />
+                                        Problème
+                                    </Badge>
+                                )}
+                            </div>
+
+                            {/* User name and email */}
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                                <span className="font-medium text-foreground">
+                                    {reservation.user.name || 'Sans nom'}
+                                </span>
+                                <span className="text-muted-foreground">•</span>
+                                <a
+                                    href={`mailto:${reservation.user.email}`}
+                                    className="text-primary hover:underline"
+                                >
+                                    {reservation.user.email}
+                                </a>
+                            </div>
+
+                            {/* Reservation period, location, and dates */}
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                <span className="inline-flex items-center gap-1">
+                                    <CalendarDays className="h-3 w-3" />
+                                    {formatDate(reservation.startDate)} — {formatDate(reservation.endDate)}
+                                </span>
+                                {reservation.location && (
+                                    <span className="inline-flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" />
+                                        {reservation.location}
+                                    </span>
+                                )}
+                                <span className="inline-flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    Demandé le {formatDate(reservation.createdAt)}
+                                </span>
+                            </div>
+
+                            {/* Return date if returned */}
+                            {status === 'RETURNED' && reservation.returnedAt && (
+                                <div className="text-xs text-blue-600">
+                                    Rendu le {formatDate(reservation.returnedAt)}
+                                </div>
                             )}
                         </div>
 
-                        {/* Content */}
-                        <div className="flex-1 p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div className="flex-1 min-w-0 space-y-3">
-                                {/* Title and status */}
-                                <div className="flex items-start gap-2 flex-wrap">
-                                    <h3 className="text-base font-semibold text-foreground">
-                                        {reservation.material.name}
-                                    </h3>
-                                    {config && (
-                                        <Badge variant="outline" className={cn('text-xs gap-1.5 shrink-0', config.className)}>
-                                            {StatusIcon && <StatusIcon className="h-3.5 w-3.5" />}
-                                            {config.label}
-                                        </Badge>
-                                    )}
-                                </div>
-
-                                {/* Material info */}
-                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-                                    {reservation.material.category && (
-                                        <span className="inline-flex items-center gap-1.5">
-                                            <Tag className="h-3.5 w-3.5" />
-                                            <span>{reservation.material.category}</span>
-                                        </span>
-                                    )}
-                                    {reservation.material.location && (
-                                        <span className="inline-flex items-center gap-1.5">
-                                            <MapPin className="h-3.5 w-3.5" />
-                                            <span>{reservation.material.location}</span>
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* User info */}
-                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
-                                    <span className="font-semibold text-foreground">
-                                        {reservation.user.name || 'Sans nom'}
-                                    </span>
-                                    <a
-                                        href={`mailto:${reservation.user.email}`}
-                                        className="text-primary hover:underline text-xs"
-                                    >
-                                        {reservation.user.email}
-                                    </a>
-                                </div>
-
-                                {/* Dates, location, purpose */}
-                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
-                                    <span className="inline-flex items-center gap-1.5 text-foreground font-medium">
-                                        <CalendarDays className="h-4 w-4" />
-                                        {formatDate(reservation.startDate)} → {formatDate(reservation.endDate)}
-                                    </span>
-                                    {reservation.location && (
-                                        <span className="inline-flex items-center gap-1.5 text-muted-foreground text-xs">
-                                            <MapPin className="h-3.5 w-3.5" />
-                                            {reservation.location}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Purpose and creation date */}
-                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-                                    {reservation.purpose && (
-                                        <span className="italic line-clamp-1 flex-1">
-                                            {reservation.purpose}
-                                        </span>
-                                    )}
-                                    <span className="inline-flex items-center gap-1.5 text-muted-foreground/70">
-                                        <Clock className="h-3.5 w-3.5" />
-                                        Demandé le {formatDate(reservation.createdAt)}
-                                    </span>
-                                </div>
-
-                                {/* Return info */}
-                                {status === 'RETURNED' && (
-                                    <div className="flex flex-wrap items-center gap-3 text-xs pt-2 border-t">
-                                        {reservation.returnedAt && (
-                                            <span className="text-blue-600 font-medium">
-                                                Rendu le {formatDate(reservation.returnedAt)}
-                                            </span>
-                                        )}
-                                        {reservation.returnHasIssue && (
-                                            <span className="inline-flex items-center gap-1.5 text-destructive font-medium">
-                                                <AlertTriangle className="h-3.5 w-3.5" />
-                                                {reservation.returnNote || 'Problème signalé'}
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 shrink-0">
-                                {status === 'PENDING' && (
-                                    <>
-                                        <Button
-                                            size="sm"
-                                            onClick={() => handleAction('APPROVED')}
-                                            disabled={loading}
-                                            className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
-                                        >
-                                            <Check className="h-3.5 w-3.5" />
-                                            Valider
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="destructive"
-                                            onClick={() => handleAction('REJECTED')}
-                                            disabled={loading}
-                                            className="gap-1.5"
-                                        >
-                                            <X className="h-3.5 w-3.5" />
-                                            Refuser
-                                        </Button>
-                                    </>
-                                )}
-                                {status === 'APPROVED' && (
+                        {/* Actions */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                            {status === 'PENDING' && (
+                                <>
                                     <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setShowReturnModal(true)}
-                                        className="gap-1.5"
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => handleAction('APPROVED')}
+                                        disabled={loading}
+                                        className="h-7 w-7 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                        title="Valider"
                                     >
-                                        <PackageCheck className="h-3.5 w-3.5" />
-                                        Forcer retour
+                                        <Check className="h-4 w-4" />
                                     </Button>
-                                )}
-                                {['PENDING', 'APPROVED'].includes(status) && (
-                                    <CancelReservationDialog
-                                        reservationId={reservation.id}
-                                        materialName={reservation.material.name}
-                                        status={status}
-                                        onSuccess={() => setStatus('CANCELLED')}
-                                    />
-                                )}
-                            </div>
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => handleAction('REJECTED')}
+                                        disabled={loading}
+                                        className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                        title="Refuser"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </>
+                            )}
+                            {status === 'APPROVED' && (
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setShowReturnModal(true)}
+                                    className="h-7 gap-1 text-xs px-2"
+                                >
+                                    <PackageCheck className="h-3.5 w-3.5" />
+                                    Retour
+                                </Button>
+                            )}
+                            {['PENDING', 'APPROVED'].includes(status) && (
+                                <CancelReservationDialog
+                                    reservationId={reservation.id}
+                                    materialName={reservation.material.name}
+                                    status={status}
+                                    onSuccess={() => setStatus('CANCELLED')}
+                                />
+                            )}
                         </div>
                     </div>
                 </CardContent>
