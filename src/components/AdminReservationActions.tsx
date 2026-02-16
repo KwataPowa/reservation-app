@@ -71,7 +71,7 @@ export default function AdminReservationActions({ reservation }: { reservation: 
                 <CardContent className="p-3">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                         <div className="flex-1 min-w-0 space-y-1.5">
-                            {/* Material name, status, and problem badge */}
+                            {/* Material name, status, user name and email */}
                             <div className="flex items-center gap-2 flex-wrap">
                                 <span className="font-semibold text-sm text-foreground">
                                     {reservation.material.name}
@@ -88,17 +88,13 @@ export default function AdminReservationActions({ reservation }: { reservation: 
                                         Problème
                                     </Badge>
                                 )}
-                            </div>
-
-                            {/* User name and email */}
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                                <span className="font-medium text-foreground">
+                                <span className="text-muted-foreground text-xs">•</span>
+                                <span className="font-medium text-foreground text-xs">
                                     {reservation.user.name || 'Sans nom'}
                                 </span>
-                                <span className="text-muted-foreground">•</span>
                                 <a
                                     href={`mailto:${reservation.user.email}`}
-                                    className="text-primary hover:underline"
+                                    className="text-primary hover:underline text-xs"
                                 >
                                     {reservation.user.email}
                                 </a>
