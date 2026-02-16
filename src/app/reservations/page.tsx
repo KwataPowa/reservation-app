@@ -27,7 +27,12 @@ export default async function MyReservationsPage() {
         returnedAt: r.returnedAt?.toISOString() || null,
         returnNote: r.returnNote,
         returnHasIssue: r.returnHasIssue,
-        materialName: r.material.name,
+        material: {
+            name: r.material.name,
+            imageUrl: r.material.imageUrl,
+            category: r.material.category,
+            location: r.material.location,
+        },
     }));
 
     return (

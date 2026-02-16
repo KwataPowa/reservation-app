@@ -26,11 +26,11 @@ export default function MaterialCard({ material, onClick }: MaterialCardProps) {
       transition={{ duration: 0.2 }}
     >
       <Card
-        className="group cursor-pointer hover:shadow-md hover:border-primary/30 transition-all duration-200 overflow-hidden h-full"
+        className="group cursor-pointer hover:shadow-lg hover:border-primary/40 transition-all duration-200 overflow-hidden h-full"
         onClick={() => onClick(material)}
       >
         {/* Image or placeholder */}
-        <div className="aspect-[16/9] bg-muted relative overflow-hidden">
+        <div className="aspect-[4/3] bg-muted relative overflow-hidden">
           {material.imageUrl ? (
             <img
               src={material.imageUrl}
@@ -39,48 +39,54 @@ export default function MaterialCard({ material, onClick }: MaterialCardProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground/40">
-              <Box className="h-10 w-10" />
+              <Box className="h-16 w-16" />
             </div>
           )}
           <Badge
             variant="outline"
-            className={cn('absolute top-2 right-2 text-[10px] font-semibold border', config.className)}
+            className={cn('absolute top-3 right-3 text-xs font-semibold border-2 shadow-sm', config.className)}
           >
             {config.label}
           </Badge>
         </div>
 
-        <CardContent className="p-4 space-y-3">
-          {/* Title */}
-          <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-1">
-            {material.name}
-          </h3>
+        <CardContent className="p-5 space-y-4">
+          {/* Title & Category */}
+          <div className="space-y-1">
+            <h3 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+              {material.name}
+            </h3>
+            {material.category && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Tag className="h-3.5 w-3.5" />
+                <span>{material.category}</span>
+              </div>
+            )}
+          </div>
 
           {/* Description */}
-          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+          <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
             {material.description || 'Aucune description disponible.'}
           </p>
 
-          {/* Meta */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
+          {/* Meta information */}
+          <div className="flex flex-wrap gap-x-4 gap-y-2 pt-2 border-t">
             {material.location && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                <MapPin className="h-3 w-3" /> {material.location}
-              </span>
-            )}
-            {material.category && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                <Tag className="h-3 w-3" /> {material.category}
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" />
+                <span className="font-medium">{material.location}</span>
               </span>
             )}
             {material.budget && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-primary">
-                <DollarSign className="h-3 w-3" /> {material.budget}
+              <span className="inline-flex items-center gap-1.5 text-xs text-primary font-medium">
+                <DollarSign className="h-3.5 w-3.5" />
+                <span>{material.budget}</span>
               </span>
             )}
             {components.length > 0 && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                <Box className="h-3 w-3" /> {components.length} élément{components.length > 1 ? 's' : ''}
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Box className="h-3.5 w-3.5" />
+                <span>{components.length} composant{components.length > 1 ? 's' : ''}</span>
               </span>
             )}
           </div>

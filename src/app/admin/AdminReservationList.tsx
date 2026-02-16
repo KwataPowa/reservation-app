@@ -18,7 +18,12 @@ interface Reservation {
     returnNote: string | null;
     returnHasIssue: boolean;
     user: { name: string | null; email: string };
-    material: { name: string; category: string | null };
+    material: {
+        name: string;
+        category: string | null;
+        imageUrl: string | null;
+        location: string | null;
+    };
 }
 
 type FilterKey = 'PENDING' | 'ACTIVE' | 'PAST';
@@ -74,7 +79,7 @@ export default function AdminReservationList({ reservations }: { reservations: R
                     description="Changez de filtre pour voir d'autres réservations."
                 />
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {filtered.map((reservation) => (
                         <AdminReservationActions
                             key={reservation.id}

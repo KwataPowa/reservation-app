@@ -85,7 +85,12 @@ export default async function AdminPage() {
                 createdAt: reservation.createdAt.toISOString(),
                 returnedAt: reservation.returnedAt?.toISOString() || null,
                 user: { name: reservation.user.name, email: reservation.user.email },
-                material: { name: reservation.material.name, category: reservation.material.category },
+                material: {
+                    name: reservation.material.name,
+                    category: reservation.material.category,
+                    imageUrl: reservation.material.imageUrl,
+                    location: reservation.material.location,
+                },
             }))} />
         </div>
     );
