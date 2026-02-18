@@ -18,8 +18,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ICUBE Resa - Réservation de matériel",
-  description: "Système de réservation de matériel scientifique ICUBE",
+  title: "IGG Resa - Réservation de matériel",
+  description: "Système de réservation de matériel scientifique IGG",
+  icons: { icon: '/igg-icon.png' },
 };
 
 export default function RootLayout({
@@ -32,7 +33,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased">
         <TooltipProvider>
           <Navbar />
-          <main className="pt-14 px-4 sm:px-6 lg:px-8 py-6 w-full max-w-7xl mx-auto">
+          <main className="pt-20 px-4 sm:px-6 lg:px-8 pb-6 w-full max-w-7xl mx-auto">
             {children}
           </main>
           <Toaster richColors position="bottom-right" />

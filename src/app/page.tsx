@@ -27,7 +27,7 @@ export default async function Home() {
     <div className="space-y-6">
       <PageHeader
         title="Parc Matériel"
-        subtitle="Système de réservation de matériel ICUBE"
+        subtitle="Système de réservation de matériel IGG"
       >
         {session?.user?.role === 'ADMIN' && (
           <Button asChild size="sm" className="gap-1.5">

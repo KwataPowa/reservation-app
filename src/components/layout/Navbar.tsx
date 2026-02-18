@@ -20,10 +20,10 @@ export default async function Navbar() {
         />
         <Link href="/" className="flex items-center gap-2.5">
           <div className="w-7 h-7 bg-primary flex items-center justify-center rounded-md text-white font-bold text-[10px] tracking-tighter">
-            IC
+            IGG
           </div>
           <span className="font-semibold text-white tracking-tight text-sm hidden sm:inline-block">
-            ICUBE <span className="text-blue-400 font-light">RESA</span>
+            IGG <span className="text-blue-400 font-light">RESA</span>
           </span>
         </Link>
       </div>

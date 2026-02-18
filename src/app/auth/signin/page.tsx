@@ -20,9 +20,9 @@ function SignInContent() {
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-lg mb-4">
-                        IC
+                        IGG
                     </div>
-                    <h1 className="text-2xl font-bold text-foreground">ICUBE Resa</h1>
+                    <h1 className="text-2xl font-bold text-foreground">IGG Resa</h1>
                     <p className="mt-2 text-sm text-muted-foreground">
                         Réservation de matériel scientifique
                     </p>

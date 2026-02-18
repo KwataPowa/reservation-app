@@ -40,10 +40,10 @@ export default function MobileNav({ isLoggedIn, isAdmin }: MobileNavProps) {
         <SheetTitle className="sr-only">Navigation</SheetTitle>
         <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
           <div className="w-8 h-8 bg-primary flex items-center justify-center rounded-md text-white font-bold text-xs tracking-tighter">
-            IC
+            IGG
           </div>
           <span className="font-semibold text-white tracking-tight">
-            ICUBE <span className="text-primary-light font-light">RESA</span>
+            IGG <span className="text-primary-light font-light">RESA</span>
           </span>
         </div>
         <nav className="flex flex-col gap-1 p-3">
