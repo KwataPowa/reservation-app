@@ -20,7 +20,7 @@ export default function NewMaterialPage() {
         }
 
         router.refresh();
-        router.push('/admin');
+        router.push('/');
     };
 
     return (
