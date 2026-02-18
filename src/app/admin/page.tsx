@@ -3,10 +3,8 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import AdminReservationList from './AdminReservationList';
 import PageHeader from '@/components/shared/PageHeader';
-import Link from 'next/link';
-import { Plus, Package, Clock, CheckCircle } from 'lucide-react';
+import { Package, Clock, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,17 +26,9 @@ export default async function AdminPage() {
 
     return (
         <div className="space-y-8 pb-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Administration</h1>
-                    <p className="text-muted-foreground mt-1">Gestion des ressources et des demandes</p>
-                </div>
-                <Button asChild size="default" className="gap-2">
-                    <Link href="/admin/materials/new">
-                        <Plus className="h-4 w-4" />
-                        Nouveau matériel
-                    </Link>
-                </Button>
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Administration</h1>
+                <p className="text-muted-foreground mt-1">Gestion des ressources et des demandes</p>
             </div>
 
             {/* KPIs */}

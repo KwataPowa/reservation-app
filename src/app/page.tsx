@@ -3,7 +3,9 @@ import MaterialList from "@/components/materials/MaterialList";
 import PageHeader from "@/components/shared/PageHeader";
 import { auth } from "@/auth";
 import { Badge } from "@/components/ui/badge";
-import { Package } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Package, Plus } from "lucide-react";
+import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +34,14 @@ export default async function Home() {
           <Package className="h-3.5 w-3.5" />
           {materials.length} unités
         </Badge>
+        {session?.user?.role === 'ADMIN' && (
+          <Button asChild size="sm" className="gap-1.5">
+            <Link href="/admin/materials/new">
+              <Plus className="h-4 w-4" />
+              Nouveau matériel
+            </Link>
+          </Button>
+        )}
       </PageHeader>
 
       <MaterialList materials={materials} categories={grouped} isAdmin={session?.user?.role === 'ADMIN'} />
