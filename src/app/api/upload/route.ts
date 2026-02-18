@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { supabase } from '@/lib/supabase'
+import sharp from 'sharp'
+
+const MAX_WIDTH = 800
+const QUALITY = 80
 
 export async function POST(request: Request) {
     const session = await auth()
@@ -28,17 +32,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Fichier trop volumineux (max 5 Mo).' }, { status: 400 })
         }
 
-        // Generate unique filename
-        const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-        const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
-
         const arrayBuffer = await file.arrayBuffer()
-        const buffer = new Uint8Array(arrayBuffer)
+
+        // Resize and convert to WebP
+        const optimized = await sharp(Buffer.from(arrayBuffer))
+            .resize(MAX_WIDTH, undefined, { withoutEnlargement: true })
+            .webp({ quality: QUALITY })
+            .toBuffer()
+
+        // Generate unique filename
+        const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`
 
         const { data, error } = await supabase.storage
             .from('material-images')
-            .upload(filename, buffer, {
-                contentType: file.type,
+            .upload(filename, optimized, {
+                contentType: 'image/webp',
                 upsert: false,
             })
 

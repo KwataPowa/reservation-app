@@ -16,6 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { MATERIAL_CATEGORIES } from '@/lib/constants';
+import ImageCropDialog from '@/components/ImageCropDialog';
 
 export interface MaterialFormData {
     name: string;
@@ -41,6 +42,7 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
+    const [cropSrc, setCropSrc] = useState<string | null>(null);
     const [form, setForm] = useState<MaterialFormData>(initialData || {
         name: '',
         description: '',
@@ -73,12 +75,19 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
         setForm({ ...form, components: newComponents });
     };
 
-    const handleFileUpload = async (file: File) => {
+    const handleFileSelect = (file: File) => {
+        const reader = new FileReader();
+        reader.onload = () => setCropSrc(reader.result as string);
+        reader.readAsDataURL(file);
+    };
+
+    const handleCropConfirm = async (blob: Blob) => {
+        setCropSrc(null);
         setUploading(true);
         setError('');
         try {
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', new File([blob], 'image.jpg', { type: 'image/jpeg' }));
             const res = await fetch('/api/upload', { method: 'POST', body: formData });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Erreur upload');
@@ -105,6 +114,7 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
     };
 
     return (
+        <>
         <Card>
             <CardContent className="p-0">
                 <div className="px-6 py-5 border-b">
@@ -195,7 +205,7 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                                             e.preventDefault();
                                             e.stopPropagation();
                                             const file = e.dataTransfer.files[0];
-                                            if (file && file.type.startsWith('image/')) handleFileUpload(file);
+                                            if (file && file.type.startsWith('image/')) handleFileSelect(file);
                                         }}
                                     >
                                         <input
@@ -204,7 +214,7 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                                             className="hidden"
                                             onChange={(e) => {
                                                 const file = e.target.files?.[0];
-                                                if (file) handleFileUpload(file);
+                                                if (file) handleFileSelect(file);
                                             }}
                                             disabled={uploading}
                                         />
@@ -389,5 +399,14 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                 </div>
             </CardContent>
         </Card>
+
+        <ImageCropDialog
+            imageSrc={cropSrc || ''}
+            isOpen={!!cropSrc}
+            onClose={() => setCropSrc(null)}
+            onConfirm={handleCropConfirm}
+            aspect={4 / 3}
+        />
+        </>
     );
 }
