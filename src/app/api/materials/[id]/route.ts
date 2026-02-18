@@ -68,6 +68,7 @@ export async function DELETE(
     }
 
     try {
+        await prisma.reservation.deleteMany({ where: { materialId: id } })
         await prisma.material.delete({ where: { id } })
         return NextResponse.json({ success: true })
     } catch (error) {
