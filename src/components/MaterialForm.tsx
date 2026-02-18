@@ -16,6 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { MATERIAL_CATEGORIES } from '@/lib/constants';
+import { getContrastColor } from '@/lib/utils';
 import ImageCropDialog from '@/components/ImageCropDialog';
 
 export interface MaterialFormData {
@@ -199,9 +200,10 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <span>Aperçu :</span>
                                     <span
-                                        className="inline-flex items-center justify-center rounded-full text-white font-bold shrink-0 leading-none"
+                                        className="inline-flex items-center justify-center rounded-full font-bold shrink-0 leading-none"
                                         style={{
                                             backgroundColor: form.badgeColor || '#6b7280',
+                                            color: form.badgeColor ? getContrastColor(form.badgeColor) : '#ffffff',
                                             width: form.badgeNumber ? '1.35rem' : '0.65rem',
                                             height: form.badgeNumber ? '1.35rem' : '0.65rem',
                                             fontSize: '0.65rem',

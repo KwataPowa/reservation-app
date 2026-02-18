@@ -4,7 +4,7 @@ import { Material } from '@prisma/client';
 import { MapPin, Tag, Box, DollarSign } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, getContrastColor } from '@/lib/utils';
 import { materialStatusConfig, type MaterialStatus } from '@/lib/constants';
 import { motion } from 'framer-motion';
 
@@ -56,9 +56,10 @@ export default function MaterialCard({ material, onClick }: MaterialCardProps) {
             <div className="flex items-center gap-2">
               {(material.badgeColor || material.badgeNumber != null) && (
                 <span
-                  className="inline-flex items-center justify-center rounded-full text-white font-bold shrink-0 leading-none"
+                  className="inline-flex items-center justify-center rounded-full font-bold shrink-0 leading-none"
                   style={{
                     backgroundColor: material.badgeColor || '#6b7280',
+                    color: material.badgeColor ? getContrastColor(material.badgeColor) : '#ffffff',
                     width: material.badgeNumber != null ? '1.35rem' : '0.65rem',
                     height: material.badgeNumber != null ? '1.35rem' : '0.65rem',
                     fontSize: '0.65rem',
