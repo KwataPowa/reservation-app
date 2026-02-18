@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Material } from '@prisma/client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MapPin, Tag, DollarSign, Box, FileText, Edit, Calendar, Ban, Trash2 } from 'lucide-react';
+import { MapPin, Tag, DollarSign, Box, FileText, Edit, Ban, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,6 @@ interface MaterialDetailDialogProps {
 
 export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmin }: MaterialDetailDialogProps) {
   const router = useRouter();
-  const [showReservation, setShowReservation] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -42,11 +41,6 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
   const config = materialStatusConfig[material.status as MaterialStatus] || materialStatusConfig.AVAILABLE;
   const canReserve = material.status === 'AVAILABLE';
   const components = (material.components as Array<{ name: string; serialNumber: string }>) || [];
-
-  const handleClose = () => {
-    setShowReservation(false);
-    onClose();
-  };
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -59,7 +53,7 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
       toast.success('Materiel supprime', {
         description: `${material.name} a ete supprime.`,
       });
-      handleClose();
+      onClose();
       router.refresh();
     } catch (err: any) {
       toast.error('Erreur', { description: err.message });
@@ -71,37 +65,23 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent
           className={cn(
-            'max-h-[85vh] p-0 gap-0 transition-[max-width] duration-300',
-            showReservation ? 'max-w-4xl' : 'max-w-2xl'
+            'max-h-[85vh] p-0 gap-0',
+            canReserve ? 'max-w-4xl' : 'max-w-2xl'
           )}
         >
           <DialogTitle className="sr-only">{material.name}</DialogTitle>
 
           <div className={cn(
             'flex',
-            showReservation ? 'flex-col md:flex-row' : 'flex-col'
+            canReserve ? 'flex-col md:flex-row' : 'flex-col'
           )}>
-            {/* Left panel: Reservation form */}
-            {showReservation && (
-              <div className="border-b md:border-b-0 md:border-r p-6 md:w-[360px] shrink-0 overflow-y-auto max-h-[85vh]">
-                <InlineReservationForm
-                  material={material}
-                  onCancel={() => setShowReservation(false)}
-                  onSuccess={() => {
-                    setShowReservation(false);
-                    handleClose();
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Right panel: Material detail */}
+            {/* Left panel: Material detail */}
             <div className={cn(
               'flex-1 min-w-0 overflow-y-auto max-h-[85vh]',
-              showReservation && 'hidden md:block'
+              canReserve && 'hidden md:block'
             )}>
               {/* Image */}
               <div className="aspect-[21/9] bg-muted relative overflow-hidden">
@@ -213,27 +193,28 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
                   {material.serialNumber && <span>S/N: {material.serialNumber}</span>}
                 </div>
 
-                <Separator />
-
-                {/* Action */}
-                {canReserve ? (
-                  <Button
-                    className="w-full gap-2"
-                    size="lg"
-                    onClick={() => setShowReservation(true)}
-                    disabled={showReservation}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    Reserver ce materiel
-                  </Button>
-                ) : (
-                  <div className="flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground bg-muted rounded-md">
-                    <Ban className="h-4 w-4" />
-                    Reservation non disponible
-                  </div>
+                {/* Unavailable message (only when not reservable) */}
+                {!canReserve && (
+                  <>
+                    <Separator />
+                    <div className="flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground bg-muted rounded-md">
+                      <Ban className="h-4 w-4" />
+                      Reservation non disponible
+                    </div>
+                  </>
                 )}
               </div>
             </div>
+
+            {/* Right panel: Reservation form (always visible when available) */}
+            {canReserve && (
+              <div className="border-t md:border-t-0 md:border-l p-6 md:w-[360px] shrink-0 overflow-y-auto max-h-[85vh]">
+                <InlineReservationForm
+                  material={material}
+                  onSuccess={onClose}
+                />
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

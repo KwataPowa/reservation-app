@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Material } from '@prisma/client';
 import { useRouter } from 'next/navigation';
-import { Calendar, Send, ArrowLeft } from 'lucide-react';
+import { Calendar, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,10 +13,9 @@ import { toast } from 'sonner';
 interface InlineReservationFormProps {
   material: Material;
   onSuccess: () => void;
-  onCancel: () => void;
 }
 
-export default function InlineReservationForm({ material, onSuccess, onCancel }: InlineReservationFormProps) {
+export default function InlineReservationForm({ material, onSuccess }: InlineReservationFormProps) {
   const router = useRouter();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -63,17 +62,12 @@ export default function InlineReservationForm({ material, onSuccess, onCancel }:
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onCancel} className="h-8 w-8 shrink-0">
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h3 className="text-sm font-semibold flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-primary" />
-            Reserver
-          </h3>
-          <p className="text-xs text-muted-foreground truncate">{material.name}</p>
-        </div>
+      <div>
+        <h3 className="text-sm font-semibold flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-primary" />
+          Reserver
+        </h3>
+        <p className="text-xs text-muted-foreground mt-1">{material.name}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
