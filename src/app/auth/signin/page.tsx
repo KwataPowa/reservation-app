@@ -19,9 +19,7 @@ function SignInContent() {
         <div className="flex min-h-[70vh] flex-col items-center justify-center px-4">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-lg mb-4">
-                        IGG
-                    </div>
+                    <img src="/igg-icon.png" alt="IGG" className="w-12 h-12 rounded-xl object-cover mb-4 mx-auto" />
                     <h1 className="text-2xl font-bold text-foreground">IGG Resa</h1>
                     <p className="mt-2 text-sm text-muted-foreground">
                         Réservation de matériel scientifique
@@ -45,7 +43,7 @@ function SignInContent() {
                             size="lg"
                         >
                             <LogIn className="h-4 w-4" />
-                            Se connecter avec CAS Unistra
+                            Se connecter avec Ernest
                         </Button>
                         <p className="text-center text-xs text-muted-foreground">
                             Vous serez redirigé vers le portail CAS de l&apos;Université de Strasbourg
