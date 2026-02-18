@@ -184,12 +184,6 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
                   </div>
                 )}
 
-                {/* Serial / ID info */}
-                <div className="flex items-center justify-between text-xs text-muted-foreground lab-mono bg-muted/50 px-3 py-2 rounded-md">
-                  <span>ID: {material.id.slice(0, 12)}</span>
-                  {material.serialNumber && <span>S/N: {material.serialNumber}</span>}
-                </div>
-
                 {/* Unavailable message (only when not reservable) */}
                 {!canReserve && (
                   <>
