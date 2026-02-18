@@ -147,6 +147,72 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                                 />
                             </div>
 
+                            {/* Pastille d'identification */}
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label>Couleur de pastille</Label>
+                                    {form.badgeColor ? (
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="color"
+                                                value={form.badgeColor}
+                                                onChange={(e) => setForm({ ...form, badgeColor: e.target.value })}
+                                                className="h-9 w-14 cursor-pointer rounded border border-input p-1"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setForm({ ...form, badgeColor: '' })}
+                                                className="gap-1 text-xs text-muted-foreground"
+                                            >
+                                                <X size={12} /> Retirer
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setForm({ ...form, badgeColor: '#3b82f6' })}
+                                            className="gap-1 text-xs"
+                                        >
+                                            <Plus size={12} /> Ajouter une couleur
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="badgeNumber">Numéro de pastille</Label>
+                                    <Input
+                                        type="number"
+                                        id="badgeNumber"
+                                        min="1"
+                                        max="999"
+                                        value={form.badgeNumber}
+                                        onChange={(e) => setForm({ ...form, badgeNumber: e.target.value })}
+                                        placeholder="Ex: 1, 2, 3..."
+                                        className="w-28"
+                                    />
+                                </div>
+                            </div>
+                            {(form.badgeColor || form.badgeNumber) && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <span>Aperçu :</span>
+                                    <span
+                                        className="inline-flex items-center justify-center rounded-full text-white font-bold shrink-0 leading-none"
+                                        style={{
+                                            backgroundColor: form.badgeColor || '#6b7280',
+                                            width: form.badgeNumber ? '1.35rem' : '0.65rem',
+                                            height: form.badgeNumber ? '1.35rem' : '0.65rem',
+                                            fontSize: '0.65rem',
+                                        }}
+                                    >
+                                        {form.badgeNumber || ''}
+                                    </span>
+                                    <span className="font-medium text-foreground">{form.name || 'Nom du matériel'}</span>
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <Label htmlFor="description">Description</Label>
                                 <Textarea
@@ -317,77 +383,6 @@ export default function MaterialForm({ initialData, onSubmit, isEditing = false 
                                     </Select>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Pastille d'identification */}
-                        <div className="space-y-4 pt-4">
-                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider border-b pb-2">Pastille d'identification</h3>
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label>Couleur</Label>
-                                    {form.badgeColor ? (
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="color"
-                                                value={form.badgeColor}
-                                                onChange={(e) => setForm({ ...form, badgeColor: e.target.value })}
-                                                className="h-9 w-14 cursor-pointer rounded border border-input p-1"
-                                            />
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setForm({ ...form, badgeColor: '' })}
-                                                className="gap-1 text-xs text-muted-foreground"
-                                            >
-                                                <X size={12} /> Retirer
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setForm({ ...form, badgeColor: '#3b82f6' })}
-                                            className="gap-1 text-xs"
-                                        >
-                                            <Plus size={12} /> Ajouter une couleur
-                                        </Button>
-                                    )}
-                                    <p className="text-[10px] text-muted-foreground">Couleur de la pastille affichée dans la liste.</p>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="badgeNumber">Numéro</Label>
-                                    <Input
-                                        type="number"
-                                        id="badgeNumber"
-                                        min="1"
-                                        max="999"
-                                        value={form.badgeNumber}
-                                        onChange={(e) => setForm({ ...form, badgeNumber: e.target.value })}
-                                        placeholder="Ex: 1, 2, 3..."
-                                        className="w-28"
-                                    />
-                                    <p className="text-[10px] text-muted-foreground">Numéro affiché sur la pastille (optionnel).</p>
-                                </div>
-                            </div>
-                            {(form.badgeColor || form.badgeNumber) && (
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <span>Aperçu :</span>
-                                    <span
-                                        className="inline-flex items-center justify-center rounded-full text-white font-bold shrink-0 leading-none"
-                                        style={{
-                                            backgroundColor: form.badgeColor || '#6b7280',
-                                            width: form.badgeNumber ? '1.35rem' : '0.65rem',
-                                            height: form.badgeNumber ? '1.35rem' : '0.65rem',
-                                            fontSize: '0.65rem',
-                                        }}
-                                    >
-                                        {form.badgeNumber || ''}
-                                    </span>
-                                    <span className="font-medium text-foreground">{form.name || 'Nom du matériel'}</span>
-                                </div>
-                            )}
                         </div>
 
                         {/* Composants / Sous-équipements */}
