@@ -20,7 +20,7 @@ export default function EditMaterialClient({ id, initialData }: { id: string, in
         }
 
         router.refresh();
-        router.push('/admin');
+        router.push('/');
     };
 
     return (
