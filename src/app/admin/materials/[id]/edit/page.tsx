@@ -35,6 +35,8 @@ export default async function EditMaterialPage({ params }: { params: Promise<{ i
         notes: material.notes || '',
         status: material.status,
         components: components,
+        badgeColor: material.badgeColor || '',
+        badgeNumber: material.badgeNumber?.toString() || '',
     };
 
     return <EditMaterialClient id={material.id} initialData={initialData} />;

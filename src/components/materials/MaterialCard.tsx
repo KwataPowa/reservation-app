@@ -53,9 +53,24 @@ export default function MaterialCard({ material, onClick }: MaterialCardProps) {
         <CardContent className="p-5 space-y-4">
           {/* Title & Category */}
           <div className="space-y-1">
-            <h3 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
-              {material.name}
-            </h3>
+            <div className="flex items-center gap-2">
+              {(material.badgeColor || material.badgeNumber != null) && (
+                <span
+                  className="inline-flex items-center justify-center rounded-full text-white font-bold shrink-0 leading-none"
+                  style={{
+                    backgroundColor: material.badgeColor || '#6b7280',
+                    width: material.badgeNumber != null ? '1.35rem' : '0.65rem',
+                    height: material.badgeNumber != null ? '1.35rem' : '0.65rem',
+                    fontSize: '0.65rem',
+                  }}
+                >
+                  {material.badgeNumber ?? ''}
+                </span>
+              )}
+              <h3 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                {material.name}
+              </h3>
+            </div>
             {material.category && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Tag className="h-3.5 w-3.5" />

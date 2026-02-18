@@ -30,6 +30,8 @@ export async function POST(request: Request) {
                 imageUrl: body.imageUrl || null,
                 notes: body.notes || null,
                 components: body.components || [],
+                badgeColor: body.badgeColor || null,
+                badgeNumber: body.badgeNumber ? parseInt(body.badgeNumber) : null,
             },
         })
         return NextResponse.json(material, { status: 201 })

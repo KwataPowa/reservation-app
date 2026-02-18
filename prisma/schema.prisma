@@ -32,6 +32,8 @@ model Material {
   imageUrl      String?   // URL to image
   components    Json?     // List of sub-items [{ name, serialNumber }]
   notes         String?   // Known issues, maintenance notes
+  badgeColor    String?   // Optional hex color for the identification badge dot
+  badgeNumber   Int?      // Optional number displayed on the badge
   status        Status    @default(AVAILABLE)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
