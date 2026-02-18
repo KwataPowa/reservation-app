@@ -39,7 +39,7 @@ export default function MobileNav({ isLoggedIn, isAdmin }: MobileNavProps) {
       <SheetContent side="left" className="w-72 bg-slate-900 border-slate-800 p-0">
         <SheetTitle className="sr-only">Navigation</SheetTitle>
         <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
-          <img src="/igg-icon.png" alt="IGG" className="w-8 h-8 rounded-md object-cover" />
+          <img src="/igg-icon.png" alt="IGG" width={32} height={32} className="w-8 h-8 rounded-md object-cover" />
           <span className="font-semibold text-white tracking-tight">
             IGG <span className="text-primary-light font-light">RESA</span>
           </span>
