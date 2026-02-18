@@ -19,7 +19,7 @@ function SignInContent() {
         <div className="flex min-h-[70vh] flex-col items-center justify-center px-4">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
-                    <img src="/igg-icon.png" alt="IGG" width={48} height={48} className="w-12 h-12 rounded-xl object-cover mb-4 mx-auto" />
+                    <img src="/igg-icon.png" alt="IGG" width={48} height={48} className="w-12 h-12 rounded-xl object-contain mb-4 mx-auto" />
                     <h1 className="text-2xl font-bold text-foreground">IGG Resa</h1>
                     <p className="mt-2 text-sm text-muted-foreground">
                         Réservation de matériel scientifique

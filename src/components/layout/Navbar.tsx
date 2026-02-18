@@ -19,7 +19,7 @@ export default async function Navbar() {
           isAdmin={user?.role === 'ADMIN'}
         />
         <Link href="/" className="flex items-center gap-2.5">
-          <img src="/igg-icon.png" alt="IGG" width={28} height={28} className="w-7 h-7 rounded-md object-cover" />
+          <img src="/igg-icon.png" alt="IGG" width={28} height={28} className="w-7 h-7 rounded-md object-contain" />
           <span className="font-semibold text-white tracking-tight text-sm hidden sm:inline-block">
             IGG <span className="text-blue-400 font-light">RESA</span>
           </span>
