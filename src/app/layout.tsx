@@ -20,7 +20,6 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "IGG Resa - Réservation de matériel",
   description: "Système de réservation de matériel scientifique IGG",
-  icons: { icon: '/igg-icon.png' },
 };
 
 export default function RootLayout({
