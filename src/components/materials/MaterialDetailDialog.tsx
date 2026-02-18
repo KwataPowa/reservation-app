@@ -68,8 +68,8 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent
           className={cn(
-            'max-h-[85vh] p-0 gap-0',
-            canReserve ? 'max-w-4xl' : 'max-w-2xl'
+            'max-h-[85vh] overflow-y-auto p-0 gap-0',
+            canReserve ? 'sm:max-w-4xl' : 'sm:max-w-2xl'
           )}
         >
           <DialogTitle className="sr-only">{material.name}</DialogTitle>
@@ -79,10 +79,7 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
             canReserve ? 'flex-col md:flex-row' : 'flex-col'
           )}>
             {/* Left panel: Material detail */}
-            <div className={cn(
-              'flex-1 min-w-0 overflow-y-auto max-h-[85vh]',
-              canReserve && 'hidden md:block'
-            )}>
+            <div className="flex-1 min-w-0">
               {/* Image */}
               <div className="aspect-[21/9] bg-muted relative overflow-hidden">
                 {material.imageUrl ? (
@@ -208,7 +205,7 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
 
             {/* Right panel: Reservation form (always visible when available) */}
             {canReserve && (
-              <div className="border-t md:border-t-0 md:border-l p-6 md:w-[360px] shrink-0 overflow-y-auto max-h-[85vh]">
+              <div className="border-t md:border-t-0 md:border-l p-6 md:w-[360px] shrink-0">
                 <InlineReservationForm
                   material={material}
                   onSuccess={onClose}
