@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
+import { cn, getContrastColor } from '@/lib/utils';
 import { materialStatusConfig, type MaterialStatus } from '@/lib/constants';
 import InlineReservationForm from '@/components/reservations/InlineReservationForm';
 import { toast } from 'sonner';
@@ -102,7 +102,23 @@ export default function MaterialDetailDialog({ material, isOpen, onClose, isAdmi
                 {/* Header */}
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground leading-tight">{material.name}</h2>
+                    <div className="flex items-center gap-2">
+                      {(material.badgeColor || material.badgeNumber != null) && (
+                        <span
+                          className="inline-flex items-center justify-center rounded-full font-bold shrink-0 leading-none"
+                          style={{
+                            backgroundColor: material.badgeColor || '#6b7280',
+                            color: material.badgeColor ? getContrastColor(material.badgeColor) : '#ffffff',
+                            width: material.badgeNumber != null ? '1.5rem' : '0.75rem',
+                            height: material.badgeNumber != null ? '1.5rem' : '0.75rem',
+                            fontSize: '0.7rem',
+                          }}
+                        >
+                          {material.badgeNumber ?? ''}
+                        </span>
+                      )}
+                      <h2 className="text-xl font-bold text-foreground leading-tight">{material.name}</h2>
+                    </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {material.category && (
                         <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
